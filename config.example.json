@@ -1,0 +1,41 @@
+{
+  "bot": {
+    "enabled": true,
+    "token": "",
+    "ownerCommandsPrefix": "ac!",
+    "starboardChannel": 0,
+    "starboardIgnore": [],
+    "starboardMin": 3
+  },
+  "updateTracker": {
+    "enabled": true,
+    "cache": "_cache.json",
+    "ignoreFirstUpdate": true,
+    "discordJADX": {
+      "enabled": true,
+      "autoPush": true,
+      "workDir": "work",
+      "repoBase": "work/repo"
+    },
+    "webhook": {
+      "enabled": true,
+      "id": 0,
+      "token": "",
+      "crosspost": true
+    },
+    "googlePlay": {
+      "alpha": {
+        "email": "",
+        "aasToken": "",
+        "jadx": true,
+        "webhook": true
+      }
+    }
+  },
+  "maxDownloadVer": 0,
+  "minDownloadVer": 0,
+  "mirrors": {},
+  "port": "3000",
+  "origin": "http://localhost:3000",
+  "ownerID": 0
+}
