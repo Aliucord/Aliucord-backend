@@ -143,10 +143,28 @@ func generateMessageEmbed(msg *discord.Message) discord.Embed {
 		Color:     16777130,
 	}
 
-	if len(msg.Attachments) > 0 && msg.Attachments[0].Width != 0 {
-		e.Image = &discord.EmbedImage{URL: msg.Attachments[0].URL}
-	} else if len(msg.Embeds) > 0 && msg.Embeds[0].Type == discord.ImageEmbed {
-		e.Image = &discord.EmbedImage{URL: msg.Embeds[0].URL}
+	attachments := ""
+	for _, a := range msg.Attachments {
+		if a.Width != 0 && strings.HasPrefix(a.ContentType, "image") && e.Image == nil {
+			e.Image = &discord.EmbedImage{URL: a.URL}
+		} else {
+			attachments += fmt.Sprintf("[%s](%s)\n", a.Filename, a.URL)
+		}
+	}
+	if e.Image == nil {
+		for _, embed := range msg.Embeds {
+			if embed.Type == discord.ImageEmbed {
+				e.Image = &discord.EmbedImage{URL: embed.URL}
+				break
+			}
+		}
+	}
+
+	if attachments != "" {
+		e.Fields = append(e.Fields, discord.EmbedField{
+			Name:  "Attachments",
+			Value: attachments,
+		})
 	}
 
 	return e
