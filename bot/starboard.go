@@ -90,7 +90,7 @@ func processStarCount(msg *discord.Message, count int) {
 
 	if count < config.StarboardMin {
 		if starboardMsg != nil {
-			s.DeleteMessage(config.StarboardChannel, starboardMsg.ID)
+			s.DeleteMessage(config.StarboardChannel, starboardMsg.ID, "no enough stars")
 		}
 		return
 	}
@@ -107,7 +107,7 @@ func processStarCount(msg *discord.Message, count int) {
 					Components: &components,
 				})
 			} else {
-				s.EditMessage(config.StarboardChannel, starboardMsg.ID, content, &embed, false)
+				s.EditMessage(config.StarboardChannel, starboardMsg.ID, content, embed)
 			}
 		}
 	} else {
