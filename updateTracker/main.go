@@ -36,12 +36,11 @@ var (
 func StartUpdateTracker(cfg *common.Config) {
 	config = cfg
 	c := cfg.UpdateTracker
+	initGPCheckers(c.GooglePlay)
 
 	if !c.Enabled {
 		return
 	}
-
-	initGPCheckers(c.GooglePlay)
 
 	var err error
 	cache, err = newCache(c.Cache)
@@ -171,7 +170,7 @@ func GetDownloadURL(version int, bypass bool) (url string, err error) {
 	url, err = aptoide.DownloadUrlResolver(discordPkg, version)
 	if err != nil {
 		url, err = gpCheckers["alpha"].GetDownloadURL(version)
-		dlCache[version] = DlCache{URL: url, GP: true, Expiry: time.Now().Unix() + int64(22*time.Hour), Error: err}
+		dlCache[version] = DlCache{URL: url, GP: true, Expiry: time.Now().Unix() + 22*60*60, Error: err}
 		return
 	}
 	dlCache[version] = DlCache{URL: url}
