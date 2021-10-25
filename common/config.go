@@ -21,6 +21,7 @@ type (
 		StarboardChannel    discord.ChannelID
 		StarboardIgnore     []discord.ChannelID
 		StarboardMin        int
+		AutoPublish         bool
 	}
 
 	UpdateTrackerConfig struct {
@@ -34,10 +35,9 @@ type (
 	}
 
 	UpdateWebhookConfig struct {
-		Enabled   bool
-		ID        discord.WebhookID
-		Token     string
-		Crosspost bool
+		Enabled bool
+		ID      discord.WebhookID
+		Token   string
 	}
 
 	GooglePlayChannelConfig struct {

@@ -5,7 +5,8 @@
     "ownerCommandsPrefix": "ac!",
     "starboardChannel": 0,
     "starboardIgnore": [],
-    "starboardMin": 3
+    "starboardMin": 3,
+    "autoPublish": true
   },
   "updateTracker": {
     "enabled": true,
@@ -20,8 +21,7 @@
     "webhook": {
       "enabled": true,
       "id": 0,
-      "token": "",
-      "crosspost": true
+      "token": ""
     },
     "googlePlay": {
       "alpha": {

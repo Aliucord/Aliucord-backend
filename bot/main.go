@@ -34,6 +34,19 @@ func StartBot(cfg *common.Config) {
 
 	initStarboard()
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
+		if config.AutoPublish {
+			channel, _ := s.Channel(msg.ChannelID)
+			if channel.Type == discord.GuildNews {
+				_, err := s.CrosspostMessage(msg.ChannelID, msg.ID)
+				if err != nil {
+					logger.Printf(
+						"Failed to crosspost message:\nChannel: %s | Message: %v | Error:\n%v",
+						channel.Name, msg.ID, err,
+					)
+				}
+			}
+		}
+
 		if msg.Author.ID != cfg.OwnerID || !strings.HasPrefix(msg.Content, config.OwnerCommandsPrefix) {
 			return
 		}

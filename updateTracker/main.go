@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Aliucord/Aliucord-backend/bot"
 	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/Juby210/admh/aptoide"
 	"github.com/diamondburned/arikawa/v3/api/webhook"
@@ -118,7 +117,7 @@ func check(channel string, cfg common.GooglePlayChannelConfig) {
 	}
 
 	if update {
-		msg, err := wh.ExecuteAndWait(webhook.ExecuteData{
+		err = wh.Execute(webhook.ExecuteData{
 			Username: "Discord Update - " + strings.Title(channel),
 			Embeds: []discord.Embed{{
 				Author: &discord.EmbedAuthor{
@@ -131,13 +130,7 @@ func check(channel string, cfg common.GooglePlayChannelConfig) {
 				Color:       7506394,
 			}},
 		})
-		if err == nil {
-			if config.UpdateTracker.Webhook.Crosspost && config.Bot.Enabled {
-				bot.CrosspostMessage(msg.ChannelID, msg.ID)
-			}
-		} else {
-			logger.Println(err)
-		}
+		logger.LogIfErr(err)
 	}
 
 	if data.Version < gpVersion {
