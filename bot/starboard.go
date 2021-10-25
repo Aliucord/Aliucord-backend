@@ -120,8 +120,8 @@ func processStarCount(msg *discord.Message, count int) {
 }
 
 func generateJumpButton(url string) []discord.Component {
-	return []discord.Component{discord.ActionRowComponent{
-		Components: []discord.Component{discord.ButtonComponent{
+	return []discord.Component{&discord.ActionRowComponent{
+		Components: []discord.Component{&discord.ButtonComponent{
 			Label: "Jump",
 			URL:   url,
 			Style: discord.LinkButton,

@@ -18,26 +18,3 @@ func (logger *ExtendedLogger) LogIfErr(err error) {
 		logger.Println(err)
 	}
 }
-
-// because go is missing ternary operator:
-
-func InlineIfBool(cond, a, b bool) bool {
-	if cond {
-		return a
-	}
-	return b
-}
-
-func InlineIfStr(cond bool, a, b string) string {
-	if cond {
-		return a
-	}
-	return b
-}
-
-func InlineIfInt(cond bool, a, b int) int {
-	if cond {
-		return a
-	}
-	return b
-}
