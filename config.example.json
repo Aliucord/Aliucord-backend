@@ -7,7 +7,12 @@
     "starboardIgnore": [],
     "starboardMin": 3,
     "autoPublish": true,
-    "trollSupportID": 0
+    "trollSupportID": 0,
+    "voiceTextChatLocker": {
+      "enabled": true,
+      "voice": 0,
+      "text": 0
+    }
   },
   "updateTracker": {
     "enabled": true,

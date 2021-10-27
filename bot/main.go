@@ -33,6 +33,7 @@ func StartBot(cfg *common.Config) {
 	}
 
 	initStarboard()
+	initVoiceTextChatLocker()
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
 		if config.AutoPublish {
 			channel, _ := s.Channel(msg.ChannelID)
@@ -65,9 +66,11 @@ func StartBot(cfg *common.Config) {
 		}
 	})
 
-	s.Gateway.AddIntents(gateway.IntentDirectMessages)
-	s.Gateway.AddIntents(gateway.IntentGuildMessages)
-	s.Gateway.AddIntents(gateway.IntentGuildMessageReactions)
+	s.Gateway.AddIntents(gateway.IntentDirectMessages |
+		gateway.IntentGuildVoiceStates |
+		gateway.IntentGuildMessages |
+		gateway.IntentGuildMessageReactions,
+	)
 
 	if err = s.Open(context.Background()); err != nil {
 		logger.Fatal(err)

@@ -23,6 +23,13 @@ type (
 		StarboardMin        int
 		AutoPublish         bool
 		TrollSupportID      discord.RoleID
+		VoiceTextChatLocker *VoiceTextChatLockerConfig
+	}
+
+	VoiceTextChatLockerConfig struct {
+		Enabled bool
+		Voice   discord.ChannelID
+		Text    discord.ChannelID
 	}
 
 	UpdateTrackerConfig struct {
