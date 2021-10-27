@@ -47,6 +47,14 @@ func StartBot(cfg *common.Config) {
 			}
 		}
 
+		if common.HasRole(msg.MentionRoleIDs, config.TrollSupportID) && !common.HasRole(msg.Member.RoleIDs, config.TrollSupportID) {
+			err := s.AddRole(msg.GuildID, msg.Author.ID, config.TrollSupportID, api.AddRoleData{AuditLogReason: "mentioned troll support role"})
+			if err != nil {
+				logger.Println("Failed to assign support role")
+				logger.Println(err)
+			}
+		}
+
 		if msg.Author.ID != cfg.OwnerID || !strings.HasPrefix(msg.Content, config.OwnerCommandsPrefix) {
 			return
 		}

@@ -6,7 +6,8 @@
     "starboardChannel": 0,
     "starboardIgnore": [],
     "starboardMin": 3,
-    "autoPublish": true
+    "autoPublish": true,
+    "trollSupportID": 0
   },
   "updateTracker": {
     "enabled": true,

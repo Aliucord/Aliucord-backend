@@ -22,6 +22,7 @@ type (
 		StarboardIgnore     []discord.ChannelID
 		StarboardMin        int
 		AutoPublish         bool
+		TrollSupportID      discord.RoleID
 	}
 
 	UpdateTrackerConfig struct {
