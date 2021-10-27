@@ -3,6 +3,7 @@ package bot
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
@@ -26,18 +27,28 @@ func getStarboardEmote(count int) (ret string) {
 	return
 }
 
+var starboardMutex = &sync.Mutex{}
+
 func initStarboard() {
 	s.AddHandler(func(e *gateway.MessageReactionAddEvent) {
+		starboardMutex.Lock()
 		processReaction(e.ChannelID, e.MessageID, e.Emoji, e.UserID)
+		starboardMutex.Unlock()
 	})
 	s.AddHandler(func(e *gateway.MessageReactionRemoveEvent) {
+		starboardMutex.Lock()
 		processReaction(e.ChannelID, e.MessageID, e.Emoji, e.UserID)
+		starboardMutex.Unlock()
 	})
 	s.AddHandler(func(e *gateway.MessageReactionRemoveAllEvent) {
+		starboardMutex.Lock()
 		processStarCount(&discord.Message{ID: e.MessageID}, 0)
+		starboardMutex.Unlock()
 	})
 	s.AddHandler(func(e *gateway.MessageDeleteEvent) {
+		starboardMutex.Lock()
 		processStarCount(&discord.Message{ID: e.ID}, 0)
+		starboardMutex.Unlock()
 	})
 }
 
