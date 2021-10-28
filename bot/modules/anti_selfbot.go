@@ -1,10 +1,11 @@
 package modules
 
 import (
+	"strings"
+
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
-	"github.com/diamondburned/arikawa/v3/utils/json/option"
 )
 
 func init() {
@@ -19,9 +20,8 @@ func initAntiSelfbot() {
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
 		if !msg.Author.Bot {
 			for _, e := range msg.Embeds {
-				if e.Type == discord.NormalEmbed {
+				if e.Type == discord.NormalEmbed && !strings.Contains(e.URL, "https://twitter.com/") {
 					s.Ban(msg.GuildID, msg.Author.ID, api.BanData{
-						DeleteDays:     option.NewUint(1),
 						AuditLogReason: "sent selfbot embed",
 					})
 					break
