@@ -18,7 +18,8 @@
       "enabled": true,
       "voice": 0,
       "text": 0
-    }
+    },
+    "antiSelfbot": true
   },
   "updateTracker": {
     "enabled": true,

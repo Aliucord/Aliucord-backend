@@ -27,6 +27,7 @@ type (
 		AutoPublish         bool
 		TrollSupportRole    *TrollSupportRoleConfig
 		VoiceTextChatLocker *VoiceTextChatLockerConfig
+		AntiSelfbot         bool
 	}
 
 	StarboardConfig struct {
