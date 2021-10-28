@@ -1,4 +1,4 @@
-package bot
+package modules
 
 import (
 	"github.com/diamondburned/arikawa/v3/api"
@@ -6,6 +6,10 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/utils/handler"
 )
+
+func init() {
+	modules = append(modules, initVoiceTextChatLocker)
+}
 
 func initVoiceTextChatLocker() {
 	cfg := config.VoiceTextChatLocker

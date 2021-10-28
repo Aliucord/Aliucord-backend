@@ -2,9 +2,9 @@ package bot
 
 import (
 	"context"
-	"errors"
 	"strings"
 
+	"github.com/Aliucord/Aliucord-backend/bot/modules"
 	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
@@ -32,30 +32,9 @@ func StartBot(cfg *common.Config) {
 		logger.Println("Error:", err)
 	}
 
-	initStarboard()
-	initVoiceTextChatLocker()
+	modules.InitAllModules(logger, config, s)
+
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
-		if config.AutoPublish {
-			channel, _ := s.Channel(msg.ChannelID)
-			if channel.Type == discord.GuildNews {
-				_, err := s.CrosspostMessage(msg.ChannelID, msg.ID)
-				if err != nil {
-					logger.Printf(
-						"Failed to crosspost message:\nChannel: %s | Message: %v | Error:\n%v",
-						channel.Name, msg.ID, err,
-					)
-				}
-			}
-		}
-
-		if common.HasRole(msg.MentionRoleIDs, config.TrollSupportID) && !common.HasRole(msg.Member.RoleIDs, config.TrollSupportID) {
-			err := s.AddRole(msg.GuildID, msg.Author.ID, config.TrollSupportID, api.AddRoleData{AuditLogReason: "mentioned troll support role"})
-			if err != nil {
-				logger.Println("Failed to assign support role")
-				logger.Println(err)
-			}
-		}
-
 		if msg.Author.ID != cfg.OwnerID || !strings.HasPrefix(msg.Content, config.OwnerCommandsPrefix) {
 			return
 		}
@@ -94,13 +73,4 @@ func sendReply(cID discord.ChannelID, content string, id discord.MessageID) (*di
 		Reference:       &discord.MessageReference{MessageID: id},
 		AllowedMentions: &api.AllowedMentions{RepliedUser: option.False},
 	})
-}
-
-func CrosspostMessage(cID discord.ChannelID, id discord.MessageID) (err error) {
-	if s == nil {
-		err = errors.New("session is not initialized")
-	} else {
-		_, err = s.CrosspostMessage(cID, id)
-	}
-	return
 }

@@ -3,11 +3,17 @@
     "enabled": true,
     "token": "",
     "ownerCommandsPrefix": "ac!",
-    "starboardChannel": 0,
-    "starboardIgnore": [],
-    "starboardMin": 3,
+    "starboard": {
+      "enabled": true,
+      "channel": 0,
+      "ignore": [],
+      "min": 3
+    },
     "autoPublish": true,
-    "trollSupportID": 0,
+    "trollSupportRole": {
+      "enabled": false,
+      "id": 0
+    },
     "voiceTextChatLocker": {
       "enabled": true,
       "voice": 0,

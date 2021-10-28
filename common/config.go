@@ -3,6 +3,10 @@ package common
 import "github.com/diamondburned/arikawa/v3/discord"
 
 type (
+	ToggleableModule struct {
+		Enabled bool
+	}
+
 	Config struct {
 		Bot            *BotConfig
 		UpdateTracker  *UpdateTrackerConfig
@@ -15,25 +19,40 @@ type (
 	}
 
 	BotConfig struct {
-		Enabled             bool
+		ToggleableModule
+
 		Token               string
 		OwnerCommandsPrefix string
-		StarboardChannel    discord.ChannelID
-		StarboardIgnore     []discord.ChannelID
-		StarboardMin        int
+		Starboard           *StarboardConfig
 		AutoPublish         bool
-		TrollSupportID      discord.RoleID
+		TrollSupportRole    *TrollSupportRoleConfig
 		VoiceTextChatLocker *VoiceTextChatLockerConfig
 	}
 
+	StarboardConfig struct {
+		ToggleableModule
+
+		Channel discord.ChannelID
+		Ignore  []discord.ChannelID
+		Min     int
+	}
+
+	TrollSupportRoleConfig struct {
+		ToggleableModule
+
+		ID discord.RoleID
+	}
+
 	VoiceTextChatLockerConfig struct {
-		Enabled bool
-		Voice   discord.ChannelID
-		Text    discord.ChannelID
+		ToggleableModule
+
+		Voice discord.ChannelID
+		Text  discord.ChannelID
 	}
 
 	UpdateTrackerConfig struct {
-		Enabled           bool
+		ToggleableModule
+
 		Cache             string
 		IgnoreFirstUpdate bool
 		DiscordJADX       *DiscordJADXConfig
@@ -43,9 +62,10 @@ type (
 	}
 
 	UpdateWebhookConfig struct {
-		Enabled bool
-		ID      discord.WebhookID
-		Token   string
+		ToggleableModule
+
+		ID    discord.WebhookID
+		Token string
 	}
 
 	GooglePlayChannelConfig struct {
@@ -56,7 +76,8 @@ type (
 	}
 
 	DiscordJADXConfig struct {
-		Enabled  bool
+		ToggleableModule
+
 		AutoPush bool
 		WorkDir  string
 		RepoBase string

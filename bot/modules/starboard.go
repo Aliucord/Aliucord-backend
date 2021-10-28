@@ -1,4 +1,4 @@
-package bot
+package modules
 
 import (
 	"fmt"
@@ -10,6 +10,10 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
 )
+
+func init() {
+	modules = append(modules, initStarboard)
+}
 
 var starboardEmotes = map[int]string{
 	0:  "⭐",
@@ -30,6 +34,10 @@ func getStarboardEmote(count int) (ret string) {
 var starboardMutex = &sync.Mutex{}
 
 func initStarboard() {
+	if !config.Starboard.Enabled {
+		return
+	}
+
 	s.AddHandler(func(e *gateway.MessageReactionAddEvent) {
 		starboardMutex.Lock()
 		processReaction(e.ChannelID, e.MessageID, e.Emoji, e.UserID)
@@ -83,7 +91,7 @@ func processReaction(channelID discord.ChannelID, msgID discord.MessageID, emoji
 }
 
 func processStarCount(msg *discord.Message, count int) {
-	messages, err := s.Messages(config.StarboardChannel, uint(s.MaxMessages()))
+	messages, err := s.Messages(config.Starboard.Channel, uint(s.MaxMessages()))
 	if err != nil {
 		logger.Println(err)
 		return
@@ -99,9 +107,9 @@ func processStarCount(msg *discord.Message, count int) {
 		}
 	}
 
-	if count < config.StarboardMin {
+	if count < config.Starboard.Min {
 		if starboardMsg != nil {
-			s.DeleteMessage(config.StarboardChannel, starboardMsg.ID, "no enough stars")
+			s.DeleteMessage(config.Starboard.Channel, starboardMsg.ID, "no enough stars")
 		}
 		return
 	}
@@ -112,17 +120,17 @@ func processStarCount(msg *discord.Message, count int) {
 			embed := generateMessageEmbed(msg)
 			if len(starboardMsg.Components) == 0 { // old message without jump button
 				components := generateJumpButton(msg.URL())
-				s.EditMessageComplex(config.StarboardChannel, starboardMsg.ID, api.EditMessageData{
+				s.EditMessageComplex(config.Starboard.Channel, starboardMsg.ID, api.EditMessageData{
 					Content:    option.NewNullableString(content),
 					Embeds:     &[]discord.Embed{embed},
 					Components: &components,
 				})
 			} else {
-				s.EditMessage(config.StarboardChannel, starboardMsg.ID, content, embed)
+				s.EditMessage(config.Starboard.Channel, starboardMsg.ID, content, embed)
 			}
 		}
 	} else {
-		s.SendMessageComplex(config.StarboardChannel, api.SendMessageData{
+		s.SendMessageComplex(config.Starboard.Channel, api.SendMessageData{
 			Content:    content,
 			Embeds:     []discord.Embed{generateMessageEmbed(msg)},
 			Components: generateJumpButton(msg.URL()),
@@ -182,7 +190,7 @@ func generateMessageEmbed(msg *discord.Message) discord.Embed {
 }
 
 func IsChannelIgnored(id discord.ChannelID) bool {
-	for _, cid := range config.StarboardIgnore {
+	for _, cid := range config.Starboard.Ignore {
 		if cid == id {
 			return true
 		}
