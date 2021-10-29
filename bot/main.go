@@ -46,6 +46,7 @@ func StartBot(cfg *common.Config) {
 	})
 
 	s.Gateway.AddIntents(gateway.IntentDirectMessages |
+		gateway.IntentGuilds |
 		gateway.IntentGuildVoiceStates |
 		gateway.IntentGuildMessages |
 		gateway.IntentGuildMessageReactions,

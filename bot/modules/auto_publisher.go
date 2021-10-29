@@ -15,9 +15,11 @@ func initAutoPublisher() {
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
-		channel, _ := s.Channel(msg.ChannelID)
-		if channel.Type == discord.GuildNews {
-			_, err := s.CrosspostMessage(msg.ChannelID, msg.ID)
+		channel, err := s.Channel(msg.ChannelID)
+		if err != nil {
+			logger.Printf("Failed to get channel\n%v\n", err)
+		} else if channel.Type == discord.GuildNews {
+			_, err = s.CrosspostMessage(msg.ChannelID, msg.ID)
 			if err != nil {
 				logger.Printf(
 					"Failed to crosspost message:\nChannel: %s | Message: %v | Error:\n%v",
