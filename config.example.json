@@ -19,7 +19,8 @@
       "voice": 0,
       "text": 0
     },
-    "antiSelfbot": true
+    "antiSelfbot": true,
+    "normalizeNicknames": true
   },
   "updateTracker": {
     "enabled": true,

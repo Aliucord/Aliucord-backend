@@ -28,6 +28,7 @@ type (
 		TrollSupportRole    *TrollSupportRoleConfig
 		VoiceTextChatLocker *VoiceTextChatLockerConfig
 		AntiSelfbot         bool
+		NormalizeNicknames  bool
 	}
 
 	StarboardConfig struct {

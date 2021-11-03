@@ -42,11 +42,21 @@ func StartBot(cfg *common.Config) {
 		args := strings.Split(strings.TrimPrefix(msg.Content, config.OwnerCommandsPrefix), " ")
 		if args[0] == "eval" && len(args) > 1 {
 			evalCommand(msg, args[1:])
+		} else if args[0] == "normalize" {
+			if len(msg.Mentions) == 0 {
+				sendReply(msg.ChannelID, "Mention someone!", msg.ID)
+			} else {
+				for _, mention := range msg.Mentions {
+					modules.NormalizeNickname(msg.GuildID, mention.ID, modules.NickOrUsername(mention.Member.Nick, mention.Username))
+				}
+				sendReply(msg.ChannelID, "Done!", msg.ID)
+			}
 		}
 	})
 
 	s.Gateway.AddIntents(gateway.IntentDirectMessages |
 		gateway.IntentGuilds |
+		gateway.IntentGuildMembers |
 		gateway.IntentGuildVoiceStates |
 		gateway.IntentGuildMessages |
 		gateway.IntentGuildMessageReactions,
