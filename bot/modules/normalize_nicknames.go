@@ -439,7 +439,7 @@ func NickOrUsername(nick, username string) string {
 	}
 }
 
-func NormalizeNickname(gid discord.GuildID, uid discord.UserID, nick string) {
+func NormalizeNickname(gid discord.GuildID, uid discord.UserID, nick string) bool {
 	normalizedNick := nick
 	for _, replacement := range replacements {
 		for _, char := range replacement.special {
@@ -452,5 +452,7 @@ func NormalizeNickname(gid discord.GuildID, uid discord.UserID, nick string) {
 		if err := s.ModifyMember(gid, uid, data); err != nil {
 			logger.Println(err)
 		}
+		return true
 	}
+	return false
 }

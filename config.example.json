@@ -2,7 +2,16 @@
   "bot": {
     "enabled": true,
     "token": "",
-    "ownerCommandsPrefix": "ac!",
+    "ownerIDs": [0],
+    "commandsPrefix": "ac!",
+    "roleIDs": {
+      "modRole": 0,
+      "supportMuted": 0,
+      "prdMuted": 0,
+      "devMuted": 0,
+      "reactionMuted": 0,
+      "attachmentMuted": 0
+    },
     "starboard": {
       "enabled": true,
       "channel": 0,
@@ -50,6 +59,5 @@
   "minDownloadVer": 0,
   "mirrors": {},
   "port": "3000",
-  "origin": "http://localhost:3000",
-  "ownerID": 0
+  "origin": "http://localhost:3000"
 }

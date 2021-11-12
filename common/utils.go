@@ -21,6 +21,12 @@ func (logger *ExtendedLogger) LogIfErr(err error) {
 	}
 }
 
+func (logger *ExtendedLogger) PanicIfErr(err error) {
+	if err != nil {
+		logger.Panic(err)
+	}
+}
+
 func HasRole(roles []discord.RoleID, role discord.RoleID) bool {
 	for _, id := range roles {
 		if id == role {
