@@ -94,5 +94,7 @@ type (
 		PRD         discord.ChannelID
 		PluginsList discord.ChannelID
 		NewPlugins  discord.ChannelID
+
+		SupportCategory discord.ChannelID
 	}
 )

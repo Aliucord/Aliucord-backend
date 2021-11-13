@@ -60,6 +60,13 @@ func initAutoReplies() {
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
+		c, err := s.Channel(msg.ChannelID)
+		logger.LogIfErr(err)
+
+		if (c.ID != cfg.PRD && c.ParentID != cfg.SupportCategory) {
+			return
+		}
+
 		for _, role := range msg.Member.RoleIDs {
 			if common.HasRole(cfg.IgnoredRoles, role) {
 				return
@@ -82,7 +89,6 @@ func initAutoReplies() {
 
 			_, err := s.SendTextReply(msg.ChannelID, reply, msg.ID)
 			logger.LogIfErr(err)
-
 			return
 		}
 	})
