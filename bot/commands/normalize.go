@@ -20,7 +20,7 @@ func init() {
 }
 
 func normalizeCommand(ctx *CommandContext) (*discord.Message, error) {
-	if len(ctx.Args) > 0 && ctx.Args[0] == "everyone" {
+	if ctx.Args[0] == "everyone" {
 		counter := 0
 		members, err := s.Members(ctx.Message.GuildID)
 		if err != nil {
@@ -36,8 +36,10 @@ func normalizeCommand(ctx *CommandContext) (*discord.Message, error) {
 	} else if len(ctx.Message.Mentions) > 0 {
 		counter := 0
 		for _, mention := range ctx.Message.Mentions {
-			if modules.NormalizeNickname(ctx.Message.GuildID, mention.User.ID, mention.Member.Nick) {
-				counter++
+			if mention.ID != botUser.ID {
+				if modules.NormalizeNickname(ctx.Message.GuildID, mention.User.ID, mention.Member.Nick) {
+					counter++
+				}
 			}
 		}
 		return s.SendTextReply(ctx.Message.ChannelID, "Done! Normalized "+strconv.Itoa(counter)+" members.", ctx.Message.ID)

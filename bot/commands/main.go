@@ -58,8 +58,8 @@ func InitCommands(botLogger *common.ExtendedLogger, botConfig *common.BotConfig,
 			Args:    args[1:],
 			Prefix:  prefix,
 		}
-		if command.RequiredArgCount > len(args) {
-			_, _ = ctx.Reply("Too few arguments. Expected " + strconv.Itoa(command.RequiredArgCount) + ", got " + strconv.Itoa(len(args)))
+		if command.RequiredArgCount > len(ctx.Args) {
+			_, _ = ctx.Reply("Too few arguments. Expected " + strconv.Itoa(command.RequiredArgCount) + ", got " + strconv.Itoa(len(ctx.Args)))
 			return
 		}
 

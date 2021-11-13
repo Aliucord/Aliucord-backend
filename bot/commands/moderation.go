@@ -51,7 +51,10 @@ func makeFunc(roleId discord.RoleID) func(*CommandContext) (*discord.Message, er
 		cleanedContent = idRegex.ReplaceAllString(cleanedContent, "")
 
 		args := strings.Fields(cleanedContent)
-		durationStr := args[0]
+		durationStr := ""
+		if len(args) > 0 {
+			durationStr = args[0]
+		}
 		isDuration, _ := parseDuration(durationStr)
 		if isDuration { // TODO: Implement durations
 			args = args[1:]
