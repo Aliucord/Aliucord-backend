@@ -64,7 +64,7 @@ func helpCommand(ctx *CommandContext) (*discord.Message, error) {
 
 	embed := discord.Embed{
 		Title:       "Help",
-		Description: "For more info on a command, run `" + ctx.Prefix + "help`!\n\n" + sb.String(),
+		Description: "For more info on a command, run `" + ctx.Prefix + "help command`!\n\n" + sb.String(),
 	}
 
 	return ctx.ReplyEmbed("", embed)

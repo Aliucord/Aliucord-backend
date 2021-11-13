@@ -42,7 +42,7 @@ func InitCommands(botLogger *common.ExtendedLogger, botConfig *common.BotConfig,
 			return
 		}
 
-		command := commandsMap[args[0]]
+		command := commandsMap[strings.ToLower(args[0])]
 		if command == nil {
 			return
 		}
