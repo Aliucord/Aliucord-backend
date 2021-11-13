@@ -18,8 +18,8 @@ func r(regex string) *regexp.Regexp {
 }
 
 const (
-	CheckThePins     = "<a:checkpins:859804429536198676>"
 	JustAsk          = "https://dontasktoask.com/"
+	CheckThePins     = "<a:checkpins:859804429536198676>"
 	MentionHelp      = "Rule 9: Don't dm or mention for support"
 	ElaborateHelp    = "We can't help you if you don't tell us your issue. "
 	PluginDownloader = "This is already a coreplugin of Aliucord. Update Aliucord if it's missing."
@@ -34,8 +34,8 @@ func initAutoReplies() {
 	}
 
 	var (
-		FindPlugin = fmt.Sprintf("Look in <#%s> and <#%s>. If it doesn't exist, then %s in <#%s>", cfg.PluginsList, cfg.NewPlugins, CheckThePins, cfg.PRD)
 		PRD        = fmt.Sprintf("%s 👉 <#%s>", CheckThePins, cfg.PRD)
+		FindPlugin = fmt.Sprintf("Look in <#%s> and <#%s>. If it doesn't exist, then %s in <#%s>", cfg.PluginsList, cfg.NewPlugins, CheckThePins, cfg.PRD)
 	)
 
 	var autoRepliesString = map[string]string{
