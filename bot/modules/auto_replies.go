@@ -24,7 +24,7 @@ const (
 	ElaborateHelp    = "We can't help you if you don't tell us your issue. "
 	PluginDownloader = "This is already a coreplugin of Aliucord. Update Aliucord if it's missing."
 	FreeNitro        = "Not possible. Nitrospoof exists for \"free\" emotes, for anything else buy nitro."
-	Usage            = "Go to the plugin's repository and read the readme. Chances are the dev added a description. If you still cannot figure it out then, ping the plugin's author."
+	Usage            = "Go to the plugin's repository and read the readme. Chances are the dev added a description."
 )
 
 func initAutoReplies() {
