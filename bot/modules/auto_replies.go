@@ -18,6 +18,7 @@ func r(regex string) *regexp.Regexp {
 }
 
 const (
+	CheckThePins     = "<a:checkpins:859804429536198676>"
 	JustAsk          = "https://dontasktoask.com/"
 	MentionHelp      = "Rule 9: Don't dm or mention for support"
 	ElaborateHelp    = "We can't help you if you don't tell us your issue. "
@@ -33,8 +34,8 @@ func initAutoReplies() {
 	}
 
 	var (
-		FindPlugin = fmt.Sprintf("Look in <#%s> and <#%s>. If it doesn't exist, then read the PINS in <#%s>", cfg.PluginsList, cfg.NewPlugins, cfg.PRD)
-		PRD        = fmt.Sprintf("<a:checkpins:859804429536198676> 👉 <#%s>", cfg.PRD)
+		FindPlugin = fmt.Sprintf("Look in <#%s> and <#%s>. If it doesn't exist, then %s in <#%s>", cfg.PluginsList, cfg.NewPlugins, CheckThePins, cfg.PRD)
+		PRD        = fmt.Sprintf("%s 👉 <#%s>", CheckThePins, cfg.PRD)
 	)
 
 	var autoRepliesString = map[string]string{
@@ -49,12 +50,12 @@ func initAutoReplies() {
 
 	var autoRepliesRegex = map[*regexp.Regexp]string{
 		r("(?i)^help$"):                          ElaborateHelp,
-		r("(?i)<@\\d{2,19}> help"):               MentionHelp,
-		r("(?i)help <@\\d{2,19}>"):               MentionHelp,
+		r("(?i)<@!?\\d{2,19}> help"):             MentionHelp,
+		r("(?i)help <@!?\\d{2,19}>"):             MentionHelp,
 		r("(?i)give me .+ link"):                 FindPlugin,
 		r("(?i)link to .+ plugin"):               FindPlugin,
 		r("(?i)where is .+ plugin"):              FindPlugin,
-		r("(?i)is there(?: a )?plugin"):          FindPlugin,
+		r("(?i)is there(?: a )? .+ plugin"):      FindPlugin,
 		r("(?i)can (?:anyone|you) help(?: me)?"): JustAsk,
 	}
 
