@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Aliucord/Aliucord-backend/common"
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 )
 
@@ -15,6 +16,17 @@ func init() {
 
 func r(regex string) *regexp.Regexp {
 	return regexp.MustCompile(regex)
+}
+
+var lastReplyCache = map[discord.UserID]string{}
+
+func reply(msg *gateway.MessageCreateEvent, reply string) {
+	if lastReplyCache[msg.Author.ID] == reply {
+		return
+	}
+	_, err := s.SendTextReply(msg.ChannelID, reply, msg.ID)
+	logger.LogIfErr(err)
+	lastReplyCache[msg.Author.ID] = reply
 }
 
 const (
@@ -63,7 +75,7 @@ func initAutoReplies() {
 		c, err := s.Channel(msg.ChannelID)
 		logger.LogIfErr(err)
 
-		if (c.ID != cfg.PRD && c.ParentID != cfg.SupportCategory) {
+		if c.ID != cfg.PRD && c.ParentID != cfg.SupportCategory {
 			return
 		}
 
@@ -73,22 +85,20 @@ func initAutoReplies() {
 			}
 		}
 
-		for regex, reply := range autoRepliesRegex {
+		for regex, value := range autoRepliesRegex {
 			if regex.MatchString(msg.Content) {
-				_, err := s.SendTextReply(msg.ChannelID, reply, msg.ID)
-				logger.LogIfErr(err)
+				reply(msg, value)
 				return
 			}
 		}
 
 		content := strings.ToLower(msg.Content)
-		for trigger, reply := range autoRepliesString {
+		for trigger, value := range autoRepliesString {
 			if !strings.Contains(content, trigger) {
 				return
 			}
 
-			_, err := s.SendTextReply(msg.ChannelID, reply, msg.ID)
-			logger.LogIfErr(err)
+			reply(msg, value)
 			return
 		}
 	})
