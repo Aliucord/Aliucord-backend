@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	mentionRegex = regexp.MustCompile("<@!?\\d{17,19}>")
-	idRegex = regexp.MustCompile("\\d{17,19}")
+	mentionRegex  = regexp.MustCompile("<@!?\\d{17,19}>")
+	idRegex       = regexp.MustCompile("\\d{17,19}")
 	durationRegex = regexp.MustCompile("(\\d+)(s|seconds|secs?|m|mins?|minutes|h|hours|d|days|w|weeks)")
 )
 
@@ -20,14 +20,14 @@ type nameAndID struct {
 }
 
 func initModCommands() {
-	roles := []nameAndID {
-		{ name: "supportmute", id: config.RoleIDs.SupportMuted },
-		{ name: "devmute", id: config.RoleIDs.DevMuted },
-		{ name: "prdmute", id: config.RoleIDs.PrdMuted },
-		{ name: "attachmentmute", id: config.RoleIDs.AttachmentMuted },
-		{ name: "reactionmute", id: config.RoleIDs.ReactionMuted },
+	roles := []nameAndID{
+		{name: "supportmute", id: config.RoleIDs.SupportMuted},
+		{name: "devmute", id: config.RoleIDs.DevMuted},
+		{name: "prdmute", id: config.RoleIDs.PrdMuted},
+		{name: "attachmentmute", id: config.RoleIDs.AttachmentMuted},
+		{name: "reactionmute", id: config.RoleIDs.ReactionMuted},
 	}
-	
+
 	for _, role := range roles {
 		if role.id != 0 {
 			addCommand(&Command{
@@ -52,7 +52,8 @@ func makeFunc(roleId discord.RoleID) func(*CommandContext) (*discord.Message, er
 
 		args := strings.Fields(cleanedContent)
 		durationStr := args[0]
-		isDuration, _ := parseDuration(durationStr); if isDuration { // TODO: Implement durations
+		isDuration, _ := parseDuration(durationStr)
+		if isDuration { // TODO: Implement durations
 			args = args[1:]
 		}
 
@@ -97,7 +98,8 @@ func makeFunc(roleId discord.RoleID) func(*CommandContext) (*discord.Message, er
 }
 
 func parseDuration(text string) (bool, int64) {
-	matches := durationRegex.FindAllStringSubmatch(text, -1); if matches == nil {
+	matches := durationRegex.FindAllStringSubmatch(text, -1)
+	if matches == nil {
 		return false, 0
 	}
 

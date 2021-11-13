@@ -11,14 +11,14 @@ import (
 
 func init() {
 	addCommand(&Command{
-		Name:        "eval",
-		Aliases:     []string{},
-		Description: "Evaluate go code",
-		Usage:       "<code>",
+		Name:             "eval",
+		Aliases:          []string{},
+		Description:      "Evaluate go code",
+		Usage:            "<code>",
 		RequiredArgCount: 1,
-		OwnerOnly:   true,
-		ModOnly:     false,
-		Callback:    evalCommand,
+		OwnerOnly:        true,
+		ModOnly:          false,
+		Callback:         evalCommand,
 	})
 }
 

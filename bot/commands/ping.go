@@ -6,14 +6,14 @@ import (
 
 func init() {
 	addCommand(&Command{
-		Name:        "ping",
-		Aliases:     []string{},
-		Description: "Ping!",
-		Usage:       "",
+		Name:             "ping",
+		Aliases:          []string{},
+		Description:      "Ping!",
+		Usage:            "",
 		RequiredArgCount: 0,
-		ModOnly:     false,
-		OwnerOnly:   false,
-		Callback:    pingCommand,
+		ModOnly:          false,
+		OwnerOnly:        false,
+		Callback:         pingCommand,
 	})
 }
 

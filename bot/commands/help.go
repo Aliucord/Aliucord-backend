@@ -8,32 +8,33 @@ import (
 
 func init() {
 	addCommand(&Command{
-		Name:        "help",
-		Aliases:     []string{"h", "commands"},
-		Description: "You are here :3",
-		Usage:       "[command name]",
+		Name:             "help",
+		Aliases:          []string{"h", "commands"},
+		Description:      "You are here :3",
+		Usage:            "[command name]",
 		RequiredArgCount: 0,
-		ModOnly:     false,
-		OwnerOnly:   false,
-		Callback:    helpCommand,
+		ModOnly:          false,
+		OwnerOnly:        false,
+		Callback:         helpCommand,
 	})
 }
 
 func helpCommand(ctx *CommandContext) (*discord.Message, error) {
 	// Change prefix from <@ID> to @Username if it is a mention
-	if strings.Replace(strings.TrimRight(ctx.Prefix, " "), "!", "", -1) == "<@" + botUser.ID.String() + ">" {
+	if strings.Replace(strings.TrimRight(ctx.Prefix, " "), "!", "", -1) == "<@"+botUser.ID.String()+">" {
 		ctx.Prefix = "@" + botUser.Username + " "
 	}
 
 	if len(ctx.Args) > 0 {
-		cmd := commandsMap[ctx.Args[0]]; if cmd == nil {
+		cmd := commandsMap[ctx.Args[0]]
+		if cmd == nil {
 			return ctx.Reply("No such command: " + ctx.Args[0])
 		}
 
 		embed := discord.Embed{
 			Title:       ctx.Prefix + cmd.Name,
 			Description: "OwnerOnly: " + getEmoji(cmd.OwnerOnly) + "\nModOnly: " + getEmoji(cmd.ModOnly) + "\nRequired Args: " + strconv.Itoa(cmd.RequiredArgCount) + "\n\n" + cmd.Description,
-			Fields:      []discord.EmbedField {
+			Fields: []discord.EmbedField{
 				{
 					Name:   "Aliases",
 					Value:  strings.Join(cmd.Aliases, ", "),
@@ -54,7 +55,8 @@ func helpCommand(ctx *CommandContext) (*discord.Message, error) {
 	for key, cmd := range commandsMap {
 		// Skip aliases
 		if key == cmd.Name {
-			_, err := sb.WriteString("`" + ctx.Prefix + cmd.Name + "`: " + cmd.Description + "\n"); if err != nil {
+			_, err := sb.WriteString("`" + ctx.Prefix + cmd.Name + "`: " + cmd.Description + "\n")
+			if err != nil {
 				return nil, err
 			}
 		}

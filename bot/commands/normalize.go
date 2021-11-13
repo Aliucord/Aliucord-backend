@@ -8,14 +8,14 @@ import (
 
 func init() {
 	addCommand(&Command{
-		Name:        "normalize",
-		Aliases:     []string{"normalize", "asciify", "uncancer", "uncancerify"},
-		Description: "Normalize usernames (Replace special characters)",
-		Usage:       "<everyone | Member1 Member2...>",
+		Name:             "normalize",
+		Aliases:          []string{"normalize", "asciify", "uncancer", "uncancerify"},
+		Description:      "Normalize usernames (Replace special characters)",
+		Usage:            "<everyone | Member1 Member2...>",
 		RequiredArgCount: 1,
-		OwnerOnly:   false,
-		ModOnly:     true,
-		Callback:    normalizeCommand,
+		OwnerOnly:        false,
+		ModOnly:          true,
+		Callback:         normalizeCommand,
 	})
 }
 
