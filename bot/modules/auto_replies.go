@@ -39,13 +39,13 @@ func initAutoReplies() {
 	)
 
 	var autoRepliesString = map[string]string{
-		"free nitro":       FreeNitro,
-		"animated profile": FreeNitro,
-		"animated avatar":  FreeNitro,
-		"nitro perks":      FreeNitro,
-		"how do i use":     Usage,
 		"a plugin to":      PRD,
 		"can you make":     PRD,
+		"how do i use":     Usage,
+		"free nitro":       FreeNitro,
+		"nitro perks":      FreeNitro,
+		"animated avatar":  FreeNitro,
+		"animated profile": FreeNitro,
 	}
 
 	var autoRepliesRegex = map[*regexp.Regexp]string{
