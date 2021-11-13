@@ -29,6 +29,7 @@ type (
 		VoiceTextChatLocker *VoiceTextChatLockerConfig
 		AntiSelfbot         bool
 		NormalizeNicknames  bool
+		AutoReplyConfig     *AutoReplyConfig
 	}
 
 	StarboardConfig struct {
@@ -83,5 +84,15 @@ type (
 		AutoPush bool
 		WorkDir  string
 		RepoBase string
+	}
+
+	AutoReplyConfig struct {
+		ToggleableModule
+
+		IgnoredRoles []discord.RoleID
+
+		PRD         discord.ChannelID
+		PluginsList discord.ChannelID
+		NewPlugins  discord.ChannelID
 	}
 )

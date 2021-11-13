@@ -44,6 +44,12 @@
         "jadx": true,
         "webhook": true
       }
+    },
+    "autoReplyConfig": {
+      "ignoredRoles": [0],
+      "prd": 0,
+      "pluginsList": 0,
+      "newPlugins": 0
     }
   },
   "maxDownloadVer": 0,
