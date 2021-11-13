@@ -1,9 +1,10 @@
 package commands
 
 import (
-	"github.com/diamondburned/arikawa/v3/discord"
 	"strconv"
 	"strings"
+
+	"github.com/diamondburned/arikawa/v3/discord"
 )
 
 func init() {

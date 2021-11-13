@@ -1,9 +1,10 @@
 package commands
 
 import (
+	"strconv"
+
 	"github.com/Aliucord/Aliucord-backend/bot/modules"
 	"github.com/diamondburned/arikawa/v3/discord"
-	"strconv"
 )
 
 func init() {

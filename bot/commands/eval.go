@@ -2,11 +2,15 @@ package commands
 
 import (
 	"fmt"
+	"strings"
+
+	_ "github.com/Aliucord/Aliucord-backend/bot/anko-packages"
+	_ "github.com/mattn/anko/packages"
+
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/mattn/anko/core"
 	"github.com/mattn/anko/env"
 	"github.com/mattn/anko/vm"
-	"strings"
 )
 
 func init() {
@@ -24,9 +28,9 @@ func init() {
 
 func evalCommand(ctx *CommandContext) (*discord.Message, error) {
 	e := core.Import(env.NewEnv())
-	e.Define("s", s)
-	e.Define("msg", ctx.Message)
-	e.Define("ctx", ctx)
+	_ = e.Define("s", s)
+	_ = e.Define("msg", ctx.Message)
+	_ = e.Define("ctx", ctx)
 	ret, err := vm.Execute(e, nil, strings.Join(ctx.Args, " "))
 	if err != nil {
 		return ctx.ReplyNoMentions("ERROR:```go\n" + err.Error() + "```")

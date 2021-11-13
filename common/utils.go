@@ -3,8 +3,6 @@ package common
 import (
 	"log"
 	"os"
-
-	"github.com/diamondburned/arikawa/v3/discord"
 )
 
 type ExtendedLogger struct {
@@ -25,13 +23,4 @@ func (logger *ExtendedLogger) PanicIfErr(err error) {
 	if err != nil {
 		logger.Panic(err)
 	}
-}
-
-func HasRole(roles []discord.RoleID, role discord.RoleID) bool {
-	for _, id := range roles {
-		if id == role {
-			return true
-		}
-	}
-	return false
 }
