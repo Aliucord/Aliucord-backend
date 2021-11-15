@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  aliucord-backend:
+    image: aliucord/backend
+    build: .
+    restart: always
+    env_file:
+      - pg.env
+    expose:
+      - 3000
+    links:
+      - postgres
+
+  postgres:
+    image: postgres:alpine
+    restart: always
+    env_file:
+      - pg.env
+    volumes:
+      - aliucord-db:/var/lib/postgresql/data
+
+volumes:
+  aliucord-db:
