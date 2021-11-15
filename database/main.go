@@ -24,13 +24,8 @@ func init() {
 			return nil
 		},
 	})
-	defer closeDb()
 	if err := createSchema(); err != nil {
 		logger.Println("Failed to create schema")
 		logger.Panic(err)
 	}
-}
-
-func closeDb() {
-	_ = DB.Close()
 }

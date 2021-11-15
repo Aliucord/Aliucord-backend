@@ -5,16 +5,17 @@ import (
 	"github.com/go-pg/pg/v10/orm"
 )
 
-type MuteSchema struct {
+type Mute struct {
 	UserID  discord.UserID `pg:",notnull"`
 	RoleID  discord.RoleID `pg:",notnull"`
+	GuildID discord.GuildID `pg:",notnull"`
+	Reason  string `pg:",notnull"`
 	EndDate int64
-	Reason  string
 }
 
 func createSchema() error {
 	models := []interface{}{
-		(*MuteSchema)(nil),
+		(*Mute)(nil),
 	}
 
 	for _, model := range models {
@@ -25,15 +26,4 @@ func createSchema() error {
 		}
 	}
 	return nil
-}
-
-func createMute() (orm.Result, error) {
-	mute := MuteSchema{
-		UserID:  0,
-		RoleID:  0,
-		EndDate: 0,
-		Reason:  "",
-	}
-
-	return DB.Model(mute).Insert()
 }
