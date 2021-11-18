@@ -45,12 +45,11 @@ func initAutoReplies() {
 		return
 	}
 
-	var (
-		PRD        = fmt.Sprintf("%s 👉 <#%s>", CheckThePins, cfg.PRD)
-		FindPlugin = fmt.Sprintf("Look in <#%s> and <#%s>. If it doesn't exist, then %s in <#%s>", cfg.PluginsList, cfg.NewPlugins, CheckThePins, cfg.PRD)
-	)
+	PRD := fmt.Sprintf("%s 👉 <#%s>", CheckThePins, cfg.PRD)
+	FindPlugin := fmt.Sprintf("Look in <#%s> and <#%s>. If it doesn't exist, then %s in <#%s>",
+		cfg.PluginsList, cfg.NewPlugins, CheckThePins, cfg.PRD)
 
-	var autoRepliesString = map[string]string{
+	autoRepliesString := map[string]string{
 		"a plugin to":      PRD,
 		"can you make":     PRD,
 		"how do i use":     Usage,
@@ -60,7 +59,7 @@ func initAutoReplies() {
 		"animated profile": FreeNitro,
 	}
 
-	var autoRepliesRegex = map[*regexp.Regexp]string{
+	autoRepliesRegex := map[*regexp.Regexp]string{
 		r("(?i)^help$"):                          ElaborateHelp,
 		r("(?i)<@!?\\d{2,19}> help"):             MentionHelp,
 		r("(?i)help <@!?\\d{2,19}>"):             MentionHelp,
@@ -73,10 +72,12 @@ func initAutoReplies() {
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
 		c, err := s.Channel(msg.ChannelID)
-		logger.LogIfErr(err)
-
-		if c.ID != cfg.PRD && c.ParentID != cfg.SupportCategory {
-			return
+		if err == nil {
+			if c.ID != cfg.PRD && c.ParentID != cfg.SupportCategory {
+				return
+			}
+		} else {
+			logger.Println(err)
 		}
 
 		for _, role := range msg.Member.RoleIDs {
@@ -94,12 +95,10 @@ func initAutoReplies() {
 
 		content := strings.ToLower(msg.Content)
 		for trigger, value := range autoRepliesString {
-			if !strings.Contains(content, trigger) {
+			if strings.Contains(content, trigger) {
+				reply(msg, value)
 				return
 			}
-
-			reply(msg, value)
-			return
 		}
 	})
 }
