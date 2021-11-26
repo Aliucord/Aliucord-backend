@@ -13,6 +13,7 @@ type (
 		MaxDownloadVer int
 		MinDownloadVer int
 		Mirrors        map[int]string
+		DisableAptoide []int
 		Port           string
 		Origin         string
 		OwnerID        discord.UserID

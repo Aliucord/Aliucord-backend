@@ -160,12 +160,23 @@ func GetDownloadURL(version int, bypass bool) (url string, err error) {
 		}
 	}
 
-	url, err = aptoide.DownloadUrlResolver(discordPkg, version)
-	if err != nil {
-		url, err = gpCheckers["alpha"].GetDownloadURL(version)
-		dlCache[version] = DlCache{URL: url, GP: true, Expiry: time.Now().Unix() + 22*60*60, Error: err}
-		return
+	useAptoide := true
+	for _, v := range config.DisableAptoide {
+		if v == version {
+			useAptoide = false
+			break
+		}
 	}
-	dlCache[version] = DlCache{URL: url}
+
+	if useAptoide {
+		url, err = aptoide.DownloadUrlResolver(discordPkg, version)
+		if err == nil {
+			dlCache[version] = DlCache{URL: url}
+			return
+		}
+	}
+
+	url, err = gpCheckers["alpha"].GetDownloadURL(version)
+	dlCache[version] = DlCache{URL: url, GP: true, Expiry: time.Now().Unix() + 22*60*60, Error: err}
 	return
 }
