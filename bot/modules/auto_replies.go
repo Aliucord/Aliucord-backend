@@ -71,6 +71,10 @@ func initAutoReplies() {
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
+		if msg.Member == nil {
+			return
+		}
+
 		c, err := s.Channel(msg.ChannelID)
 		if err == nil {
 			if c.ID != cfg.PRD && c.ParentID != cfg.SupportCategory {
