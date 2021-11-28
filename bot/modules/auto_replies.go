@@ -69,7 +69,7 @@ func initAutoReplies() {
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
-		if msg.Member == nil || len(msg.Attachments) > 0 || (msg.ReferencedMessage != nil && msg.ReferencedMessage.Author.ID == msg.Author.ID) {
+		if msg.Member == nil || len(msg.Attachments) > 0 || (msg.ReferencedMessage != nil && msg.ReferencedMessage.Author.ID == msg.Author.ID) || msg.Author.Bot || strings.HasPrefix(msg.Content, "Quick Aliucord ") {
 			return
 		}
 
