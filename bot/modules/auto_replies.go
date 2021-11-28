@@ -60,15 +60,12 @@ func initAutoReplies() {
 		r("^i need help$"):                            ElaborateHelp,
 		r("<@!?\\d{2,19}> help"):                      MentionHelp,
 		r("help <@!?\\d{2,19}>"):                      MentionHelp,
-		r("where(?: i)s(?: the)? plugin ?downloader"): PluginDownloader,
-		r("can'?t download plugin ?downloader"):       PluginDownloader,
-		r("^give me .+ link$"):                        FindPlugin,
-		r("^link to .+ plugin$"):                      FindPlugin,
-		r("^is there a .+ plugin$"):                   FindPlugin,
+		r("animated (profile|avatar)"):                FreeNitro,
 		r("^is there a plugin for .+"):                FindPlugin,
 		r("^where(?: i)?s(?: the )?.+ plugin$"):       FindPlugin,
 		r("^can (?:anyone|you) help(?: me)?\\??$"):    JustAsk,
-		r("animated (profile|avatar)"):                FreeNitro,
+		r("can'?t download plugin ?downloader"):       PluginDownloader,
+		r("where(?: i)s(?: the)? plugin ?downloader"): PluginDownloader,
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
