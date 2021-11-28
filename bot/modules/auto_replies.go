@@ -57,11 +57,11 @@ func initAutoReplies() {
 	}
 
 	autoRepliesRegex := map[*regexp.Regexp]string{
-		r("^i need help$"):                            ElaborateHelp,
+		r("^(?:i need )?help(?: me)?$"):               ElaborateHelp,
 		r("<@!?\\d{2,19}> help"):                      MentionHelp,
 		r("help <@!?\\d{2,19}>"):                      MentionHelp,
-		r("animated (profile|avatar|pfp)"):                FreeNitro,
-		r("^is there a plugin .+"):                FindPlugin,
+		r("animated (profile|avatar|pfp)"):            FreeNitro,
+		r("^is there a plugin .+"):                    FindPlugin,
 		r("^where(?: i)?s(?: the )?.+ plugin$"):       FindPlugin,
 		r("^can (?:anyone|you) help(?: me)?\\??$"):    JustAsk,
 		r("can'?t download plugin ?downloader"):       PluginDownloader,
