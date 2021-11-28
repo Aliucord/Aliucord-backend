@@ -61,7 +61,7 @@ func initAutoReplies() {
 		r("<@!?\\d{2,19}> help"):                      MentionHelp,
 		r("help <@!?\\d{2,19}>"):                      MentionHelp,
 		r("animated (profile|avatar|pfp)"):                FreeNitro,
-		r("^is there a plugin for .+"):                FindPlugin,
+		r("^is there a plugin .+"):                FindPlugin,
 		r("^where(?: i)?s(?: the )?.+ plugin$"):       FindPlugin,
 		r("^can (?:anyone|you) help(?: me)?\\??$"):    JustAsk,
 		r("can'?t download plugin ?downloader"):       PluginDownloader,
