@@ -38,6 +38,7 @@ const (
 	InstallThemes    = " Themer plugin <https://discord.com/channels/811255666990907402/811261298997460992/845243103757467658>"
 	FreeNitro        = "Not possible. Nitrospoof exists for \"free\" emotes, for anything else buy nitro."
 	Usage            = "Go to the plugin's repository and read the readme. Chances are the dev added a description."
+	BetterInternet   = "This happens when you have an old/misbehaving router. Use mobile data (~120mb usage) or maybe a VPN (*or just get better internet*)."
 	PluginDownloader = "PluginDownloader is now a part of Aliucord. (It won't be present in the plugin list) If the option to download plugins is still missing, update Aliucord."
 )
 
@@ -52,10 +53,12 @@ func initAutoReplies() {
 		cfg.PluginsList, cfg.NewPlugins, CheckThePins, cfg.PRD)
 
 	autoRepliesString := map[string]string{
-		"a plugin to":  PRD,
-		"can you make": PRD,
-		"how do i use": Usage,
-		"free nitro":   FreeNitro,
+		"a plugin to":           PRD,
+		"can you make":          PRD,
+		"how do i use":          Usage,
+		"free nitro":            FreeNitro,
+		"handshake exception":   BetterInternet,
+		"connection terminated": BetterInternet,
 	}
 
 	autoRepliesRegex := map[*regexp.Regexp]string{
