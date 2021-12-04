@@ -15,7 +15,7 @@ func init() {
 }
 
 func r(regex string) *regexp.Regexp {
-	return regexp.MustCompile(regex)
+	return regexp.MustCompile("(?i)" + regex)
 }
 
 var lastReplyCache = map[discord.UserID]string{}
@@ -34,9 +34,12 @@ const (
 	CheckThePins     = "<a:checkpins:859804429536198676>"
 	MentionHelp      = "Rule 9: Don't dm or mention for support"
 	ElaborateHelp    = "We can't help you if you don't tell us your issue. "
-	PluginDownloader = "This is already a coreplugin of Aliucord. Update Aliucord if it's missing."
+	InstallPlugins   = "<https://github.com/Aliucord/Aliucord#-plugin-installation>"
+	InstallThemes    = " Themer plugin <https://discord.com/channels/811255666990907402/811261298997460992/845243103757467658>"
 	FreeNitro        = "Not possible. Nitrospoof exists for \"free\" emotes, for anything else buy nitro."
 	Usage            = "Go to the plugin's repository and read the readme. Chances are the dev added a description."
+	BetterInternet   = "This happens when you have an old/misbehaving router. Use mobile data (~120mb usage) or maybe a VPN (*or just get better internet*)."
+	PluginDownloader = "PluginDownloader is now a part of Aliucord. (It won't be present in the plugin list) If the option to download plugins is still missing, update Aliucord."
 )
 
 func initAutoReplies() {
@@ -46,32 +49,34 @@ func initAutoReplies() {
 	}
 
 	PRD := fmt.Sprintf("%s 👉 <#%s>", CheckThePins, cfg.PRD)
-	FindPlugin := fmt.Sprintf("Look in <#%s> and <#%s>. If it doesn't exist, then %s in <#%s>",
+	FindPlugin := fmt.Sprintf("Search in <#%s> and <#%s>. If it doesn't exist, then %s in <#%s>",
 		cfg.PluginsList, cfg.NewPlugins, CheckThePins, cfg.PRD)
 
 	autoRepliesString := map[string]string{
-		"a plugin to":      PRD,
-		"can you make":     PRD,
-		"how do i use":     Usage,
-		"free nitro":       FreeNitro,
-		"nitro perks":      FreeNitro,
-		"animated avatar":  FreeNitro,
-		"animated profile": FreeNitro,
+		"a plugin to":           PRD,
+		"can you make":          PRD,
+		"how do i use":          Usage,
+		"free nitro":            FreeNitro,
+		"handshake exception":   BetterInternet,
+		"connection terminated": BetterInternet,
 	}
 
 	autoRepliesRegex := map[*regexp.Regexp]string{
-		r("(?i)^help$"):                          ElaborateHelp,
-		r("(?i)<@!?\\d{2,19}> help"):             MentionHelp,
-		r("(?i)help <@!?\\d{2,19}>"):             MentionHelp,
-		r("(?i)give me .+ link"):                 FindPlugin,
-		r("(?i)link to .+ plugin"):               FindPlugin,
-		r("(?i)where is .+ plugin"):              FindPlugin,
-		r("(?i)is there(?: a )? .+ plugin"):      FindPlugin,
-		r("(?i)can (?:anyone|you) help(?: me)?"): JustAsk,
+		r("^(?:i need )?help(?: me)?$"):               ElaborateHelp,
+		r("<@!?\\d{2,19}> help"):                      MentionHelp,
+		r("help <@!?\\d{2,19}>"):                      MentionHelp,
+		r("animated (profile|avatar|pfp)"):            FreeNitro,
+		r("^is there a plugin .+"):                    FindPlugin,
+		r("^where(?: i)?s(?: the )?.+ plugin$"):       FindPlugin,
+		r("^can (?:anyone|you) help(?: me)?\\??$"):    JustAsk,
+		r("can'?t download plugin ?downloader"):       PluginDownloader,
+		r("where(?: i)s(?: the)? plugin ?downloader"): PluginDownloader,
+		r("how (to|do I|do you) install plugins"):     InstallPlugins,
+		r("how (to|do I|do you) install themes"):      InstallThemes,
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
-		if msg.Member == nil {
+		if msg.Member == nil || len(msg.Attachments) > 0 || (msg.ReferencedMessage != nil && msg.ReferencedMessage.Author.ID == msg.Author.ID) || msg.Author.Bot || strings.HasPrefix(msg.Content, "Quick Aliucord ") {
 			return
 		}
 
