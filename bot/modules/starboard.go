@@ -5,7 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
@@ -191,5 +190,10 @@ func generateMessageEmbed(msg *discord.Message) discord.Embed {
 }
 
 func IsChannelIgnored(id discord.ChannelID) bool {
-	return common.ArrayContains(id, config.Starboard.Ignore)
+	for _, cid := range config.Starboard.Ignore {
+		if cid == id {
+			return true
+		}
+	}
+	return false
 }

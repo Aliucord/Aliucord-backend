@@ -47,10 +47,10 @@ func InitCommands(botLogger *common.ExtendedLogger, botConfig *common.BotConfig,
 		if command == nil {
 			return
 		}
-		if command.OwnerOnly && !common.ArrayContains(msg.Author.ID, config.OwnerIDs) {
+		if command.OwnerOnly && !common.HasUser(config.OwnerIDs, msg.Author.ID) {
 			return
 		}
-		if command.ModOnly && !common.ArrayContains(config.RoleIDs.ModRole, msg.Member.RoleIDs) {
+		if command.ModOnly && !common.HasRole(msg.Member.RoleIDs, config.RoleIDs.ModRole) {
 			return
 		}
 

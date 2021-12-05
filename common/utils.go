@@ -3,6 +3,8 @@ package common
 import (
 	"log"
 	"os"
+
+	"github.com/diamondburned/arikawa/v3/discord"
 )
 
 type ExtendedLogger struct {
@@ -23,4 +25,24 @@ func (logger *ExtendedLogger) PanicIfErr(err error) {
 	if err != nil {
 		logger.Panic(err)
 	}
+}
+
+// please go add generics faster
+
+func HasRole(roles []discord.RoleID, role discord.RoleID) bool {
+	for _, id := range roles {
+		if id == role {
+			return true
+		}
+	}
+	return false
+}
+
+func HasUser(users []discord.UserID, user discord.UserID) bool {
+	for _, id := range users {
+		if id == user {
+			return true
+		}
+	}
+	return false
 }

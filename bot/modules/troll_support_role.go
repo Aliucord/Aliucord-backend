@@ -17,7 +17,7 @@ func initTrollSupportRole() {
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
-		if common.ArrayContains(cfg.ID, msg.MentionRoleIDs) && !common.ArrayContains(cfg.ID, msg.Member.RoleIDs) {
+		if common.HasRole(msg.MentionRoleIDs, cfg.ID) && !common.HasRole(msg.Member.RoleIDs, cfg.ID) {
 			err := s.AddRole(msg.GuildID, msg.Author.ID, cfg.ID, api.AddRoleData{AuditLogReason: "mentioned troll support role"})
 			if err != nil {
 				logger.Println("Failed to assign support role")

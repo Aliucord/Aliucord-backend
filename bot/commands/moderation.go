@@ -165,7 +165,7 @@ func makeUnmuteFunc(roleID discord.RoleID, muteName string) func(*CommandContext
 		if err != nil {
 			return ctx.Reply("I couldn't find that Member")
 		}
-		if !common.ArrayContains(roleID, member.RoleIDs) {
+		if !common.HasRole(member.RoleIDs, roleID) {
 			return ctx.Reply("That member isnt't " + muteName + "d")
 		}
 
