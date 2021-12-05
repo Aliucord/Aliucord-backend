@@ -3,6 +3,8 @@ LABEL maintainer="Aliucord"
 
 WORKDIR /build
 
+RUN apk add git
+
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
@@ -19,4 +21,6 @@ WORKDIR /app
 RUN cp /build/aliucord-backend .
 COPY config.json .
 
+RUN adduser --disabled-password --gecos "" juby
+USER juby
 CMD [ "/app/aliucord-backend" ]

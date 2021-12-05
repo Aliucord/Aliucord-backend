@@ -38,8 +38,8 @@
     "discordJADX": {
       "enabled": true,
       "autoPush": true,
-      "workDir": "work",
-      "repoBase": "work/repo"
+      "workDir": "/var/lib/work",
+      "repoBase": "/var/lib/work/repo"
     },
     "webhook": {
       "enabled": true,
