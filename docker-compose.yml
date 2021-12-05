@@ -14,6 +14,10 @@ services:
     volumes:
       - ./work:/var/lib/work
       - ~/.git-credentials:/home/juby/.git-credentials
+      - ./_cache.json:/home/juby/Aliucord-backend/_cache.json
+      - ./_sessionAlpha.json:/home/juby/Aliucord-backend/_sessionAlpha.json
+      - ./_sessionBeta.json:/home/juby/Aliucord-backend/_sessionBeta.json
+      - ./_sessionStable.json:/home/juby/Aliucord-backend/_sessionStable.json
 
   postgres:
     image: postgres:alpine

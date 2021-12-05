@@ -17,10 +17,12 @@ COPY database database
 
 RUN go build -o aliucord-backend
 
-WORKDIR /app
+RUN mkdir -p /home/juby/Aliucord-backend
+WORKDIR /home/juby/Aliucord-backend
 RUN cp /build/aliucord-backend .
 COPY config.json .
 
 RUN adduser --disabled-password --gecos "" juby
 USER juby
-CMD [ "/app/aliucord-backend" ]
+
+CMD [ "/home/juby/Aliucord-backend/aliucord-backend" ]
