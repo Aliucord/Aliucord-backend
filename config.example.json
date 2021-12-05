@@ -2,7 +2,16 @@
   "bot": {
     "enabled": true,
     "token": "",
-    "ownerCommandsPrefix": "ac!",
+    "ownerIDs": [0],
+    "commandsPrefix": "ac!",
+    "roleIDs": {
+      "modRole": 0,
+      "supportMuted": 0,
+      "prdMuted": 0,
+      "devMuted": 0,
+      "reactionMuted": 0,
+      "attachmentMuted": 0
+    },
     "starboard": {
       "enabled": true,
       "channel": 0,
@@ -37,8 +46,8 @@
     "discordJADX": {
       "enabled": true,
       "autoPush": true,
-      "workDir": "work",
-      "repoBase": "work/repo"
+      "workDir": "/var/lib/work",
+      "repoBase": "/var/lib/work/repo"
     },
     "webhook": {
       "enabled": true,
@@ -59,6 +68,5 @@
   "mirrors": {},
   "disableAptoide": [0],
   "port": "3000",
-  "origin": "http://localhost:3000",
-  "ownerID": 0
+  "origin": "http://localhost:3000"
 }

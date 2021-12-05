@@ -16,13 +16,15 @@ type (
 		DisableAptoide []int
 		Port           string
 		Origin         string
-		OwnerID        discord.UserID
 	}
 
 	BotConfig struct {
 		ToggleableModule
 
 		Token               string
+		OwnerIDs            []discord.UserID
+		RoleIDs             *RoleIDsConfig
+		CommandsPrefix      string
 		OwnerCommandsPrefix string
 		Starboard           *StarboardConfig
 		AutoPublish         bool
@@ -31,6 +33,15 @@ type (
 		AntiSelfbot         bool
 		NormalizeNicknames  bool
 		AutoReplyConfig     *AutoReplyConfig
+	}
+
+	RoleIDsConfig struct {
+		ModRole         discord.RoleID
+		SupportMuted    discord.RoleID
+		PrdMuted        discord.RoleID
+		DevMuted        discord.RoleID
+		ReactionMuted   discord.RoleID
+		AttachmentMuted discord.RoleID
 	}
 
 	StarboardConfig struct {

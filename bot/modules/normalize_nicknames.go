@@ -1,11 +1,12 @@
 package modules
 
 import (
+	"strings"
+
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
-	"strings"
 )
 
 func init() {
@@ -440,7 +441,7 @@ func NickOrUsername(nick, username string) string {
 	}
 }
 
-func NormalizeNickname(gid discord.GuildID, uid discord.UserID, nick string) {
+func NormalizeNickname(gid discord.GuildID, uid discord.UserID, nick string) bool {
 	normalizedNick := nick
 	for _, replacement := range replacements {
 		for _, char := range replacement.special {
@@ -450,8 +451,8 @@ func NormalizeNickname(gid discord.GuildID, uid discord.UserID, nick string) {
 
 	if normalizedNick != nick {
 		data := api.ModifyMemberData{Nick: option.NewString(normalizedNick), AuditLogReason: api.AuditLogReason("Normalize nickname")}
-		if err := s.ModifyMember(gid, uid, data); err != nil {
-			logger.Println(err)
-		}
+		err := s.ModifyMember(gid, uid, data); logger.LogIfErr(err)
+		return true
 	}
+	return false
 }
