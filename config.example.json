@@ -29,7 +29,15 @@
       "text": 0
     },
     "antiSelfbot": true,
-    "normalizeNicknames": true
+    "normalizeNicknames": true,
+    "autoReplyConfig": {
+      "enabled": true,
+      "ignoredRoles": [0],
+      "prd": 0,
+      "pluginsList": 0,
+      "newPlugins": 0,
+      "supportCategory": 0
+    }
   },
   "updateTracker": {
     "enabled": true,
@@ -58,6 +66,7 @@
   "maxDownloadVer": 0,
   "minDownloadVer": 0,
   "mirrors": {},
+  "disableAptoide": [0],
   "port": "3000",
   "origin": "http://localhost:3000"
 }

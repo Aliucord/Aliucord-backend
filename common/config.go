@@ -13,6 +13,7 @@ type (
 		MaxDownloadVer int
 		MinDownloadVer int
 		Mirrors        map[int]string
+		DisableAptoide []int
 		Port           string
 		Origin         string
 	}
@@ -31,6 +32,7 @@ type (
 		VoiceTextChatLocker *VoiceTextChatLockerConfig
 		AntiSelfbot         bool
 		NormalizeNicknames  bool
+		AutoReplyConfig     *AutoReplyConfig
 	}
 
 	RoleIDsConfig struct {
@@ -94,5 +96,17 @@ type (
 		AutoPush bool
 		WorkDir  string
 		RepoBase string
+	}
+
+	AutoReplyConfig struct {
+		ToggleableModule
+
+		IgnoredRoles []discord.RoleID
+
+		PRD         discord.ChannelID
+		PluginsList discord.ChannelID
+		NewPlugins  discord.ChannelID
+
+		SupportCategory discord.ChannelID
 	}
 )
