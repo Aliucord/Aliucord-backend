@@ -20,7 +20,9 @@ func initAntiSelfbot() {
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
 		if !msg.Author.Bot {
 			for _, e := range msg.Embeds {
-				if e.Type == discord.NormalEmbed && !strings.Contains(e.URL, "https://twitter.com/") {
+				if e.Type == discord.NormalEmbed &&
+					!strings.Contains(e.URL, "https://twitter.com/") &&
+					!strings.Contains(e.URL, "https://news.ycombinator.com/") {
 					logger.LogIfErr(s.Ban(msg.GuildID, msg.Author.ID, api.BanData{
 						AuditLogReason: "sent selfbot embed (" + api.AuditLogReason(msg.URL()) + ")",
 					}))
