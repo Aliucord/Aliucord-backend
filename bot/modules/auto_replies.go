@@ -34,8 +34,11 @@ const (
 	CheckThePins     = "<a:checkpins:859804429536198676>"
 	MentionHelp      = "Rule 9: Don't dm or mention for support"
 	ElaborateHelp    = "We can't help you if you don't tell us your issue. "
-	InstallPlugins   = "<https://github.com/Aliucord/Aliucord#-plugin-installation>"
-	InstallThemes    = " Themer plugin <https://discord.com/channels/811255666990907402/811261298997460992/845243103757467658>"
+	InstallPlugins   = "https://cdn.discordapp.com/attachments/811261298997460992/875552420363636766/21-08-13-03-31-20.mp4" //people would rather watch a video than opening the docu so
+	InstallThemes    = "Themer plugin <https://discord.com/channels/811255666990907402/811261298997460992/845243103757467658>"
+	CreateThemes     = "Read this documentation: https://github.com/Aliucord/documentation/tree/main/theme-dev"
+	SearchThemes     = "Check <#824357609778708580> and search on there, maybe there's the theme you want"
+	AliuCrash        = "Send crashlogs (check Crashes in Settings, and copy the most recent), if there aren't any crashlogs, then its surely a native crash."
 	FreeNitro        = "Not possible. Nitrospoof exists for \"free\" emotes, for anything else buy nitro."
 	Usage            = "Go to the plugin's repository and read the readme. Chances are the dev added a description."
 	BetterInternet   = "This happens when you have an old/misbehaving router. Use mobile data (~120mb usage) or maybe a VPN (*or just get better internet*)."
@@ -73,6 +76,9 @@ func initAutoReplies() {
 		r("where(?: i)s(?: the)? plugin ?downloader"): PluginDownloader,
 		r("how (to|do I|do you) install plugins"):     InstallPlugins,
 		r("how (to|do I|do you) install themes"):      InstallThemes,
+		r("how (to|do I|do you|can i|) create themes"):CreateThemes,
+		r("(does anyone know|is there) a theme that"): SearchThemes,
+		r("my aliucord (crashed|keeps crashing|crash|crashes)"): AliuCrash,
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
