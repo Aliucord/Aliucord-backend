@@ -38,7 +38,7 @@ const (
 	InstallThemes    = "Themer plugin <https://discord.com/channels/811255666990907402/811261298997460992/845243103757467658>"
 	CreateThemes     = "Read this documentation: https://github.com/Aliucord/documentation/tree/main/theme-dev"
 	SearchThemes     = "Check <#824357609778708580> and search on there, maybe there's the theme you want"
-	AliuCrash        = "Send crashlogs (check Crashes in Settings, and copy the most recent), if there aren't any crashlogs, then its surely a native crash."
+	AliuCrash        = "Send crashlogs (check Crashes in Settings, and copy the most recent), if there aren't any crashlogs, then we can't do nothing about it. (If you want, you can try send a logcat, check <https://pastebin.com/pNhXwhrd>)"
 	FreeNitro        = "Not possible. Nitrospoof exists for \"free\" emotes, for anything else buy nitro."
 	Usage            = "Go to the plugin's repository and read the readme. Chances are the dev added a description."
 	BetterInternet   = "This happens when you have an old/misbehaving router. Use mobile data (~120mb usage) or maybe a VPN (*or just get better internet*)."
