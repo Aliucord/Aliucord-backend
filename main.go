@@ -8,10 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	_ "github.com/Aliucord/Aliucord-backend/database"
-
 	"github.com/Aliucord/Aliucord-backend/bot"
 	"github.com/Aliucord/Aliucord-backend/common"
+	"github.com/Aliucord/Aliucord-backend/database"
 	"github.com/Aliucord/Aliucord-backend/updateTracker"
 	"github.com/valyala/fasthttp"
 )
@@ -28,6 +27,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	database.InitDB(config.Database)
 	if config.Bot.Enabled {
 		bot.StartBot(config)
 		defer bot.StopBot()

@@ -39,6 +39,12 @@
       "supportCategory": 0
     }
   },
+  "database": {
+    "addr": "127.0.0.1:5432",
+    "user": "juby",
+    "password": "postgres",
+    "db": "AliucordBackend"
+  },
   "updateTracker": {
     "enabled": true,
     "cache": "_cache.json",
@@ -46,8 +52,8 @@
     "discordJADX": {
       "enabled": true,
       "autoPush": true,
-      "workDir": "/var/lib/work",
-      "repoBase": "/var/lib/work/repo"
+      "workDir": "work",
+      "repoBase": "work/repo"
     },
     "webhook": {
       "enabled": true,

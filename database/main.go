@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"os"
 
 	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/go-pg/pg/v10"
@@ -13,12 +12,12 @@ var (
 	logger = common.NewLogger("[database]")
 )
 
-func init() {
+func InitDB(config *common.DatabaseConfig) {
 	DB = pg.Connect(&pg.Options{
-		Addr:     os.Getenv("POSTGRES_HOST") + ":" + os.Getenv("POSTGRES_PORT"),
-		User:     os.Getenv("POSTGRES_USER"),
-		Password: os.Getenv("POSTGRES_PASSWORD"),
-		Database: os.Getenv("POSTGRES_DB"),
+		Addr:     config.Addr,
+		User:     config.User,
+		Password: config.Password,
+		Database: config.DB,
 		OnConnect: func(ctx context.Context, cn *pg.Conn) error {
 			logger.Println("Successfully connected")
 			return nil

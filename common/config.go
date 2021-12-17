@@ -9,6 +9,7 @@ type (
 
 	Config struct {
 		Bot            *BotConfig
+		Database       *DatabaseConfig
 		UpdateTracker  *UpdateTrackerConfig
 		MaxDownloadVer int
 		MinDownloadVer int
@@ -63,6 +64,13 @@ type (
 
 		Voice discord.ChannelID
 		Text  discord.ChannelID
+	}
+
+	DatabaseConfig struct {
+		Addr     string
+		User     string
+		Password string
+		DB       string
 	}
 
 	UpdateTrackerConfig struct {
