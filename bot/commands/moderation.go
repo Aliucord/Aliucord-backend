@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"regexp"
 	"strconv"
 	"strings"
@@ -63,10 +64,11 @@ func initModCommands() {
 	s.AddHandler(func(e *gateway.GuildMemberAddEvent) {
 		var mutes []database.Mute
 
-		err := database.DB.Model(&mutes).
+		err := database.DB.NewSelect().
+			Model(&mutes).
 			Where("user_id = ?", e.User.ID).
 			Where("guild_id = ?", e.GuildID).
-			Select()
+			Scan(context.Background())
 		if err != nil {
 			logger.Println("Failed to retrieve mutes for user ", err)
 		} else {
@@ -84,7 +86,10 @@ func initModCommands() {
 	// Start unmute timers
 	var mutes []database.Mute
 
-	err := database.DB.Model(&mutes).Where("end_date != ?", -1).Select()
+	err := database.DB.NewSelect().
+		Model(&mutes).
+		Where("end_date != ?", -1).
+		Scan(context.Background())
 	if err != nil {
 		logger.Println("Failed to retrieve mutes", err)
 	} else {
@@ -174,10 +179,11 @@ func makeUnmuteFunc(roleID discord.RoleID, muteName string) func(*CommandContext
 			return ctx.Reply("Failed to unmute that member")
 		}
 
-		_, err = database.DB.Model((*database.Mute)(nil)).
+		_, err = database.DB.NewDelete().
+			Model((*database.Mute)(nil)).
 			Where("role_id = ?", roleID).
 			Where("user_id = ?", userID).
-			Delete()
+			Exec(context.Background())
 		logger.LogIfErr(err)
 
 		return ctx.Reply("Done!")
@@ -230,16 +236,17 @@ func addMuteRole(gid discord.GuildID, uid discord.UserID, rid discord.RoleID, da
 			Reason:  string(data.AuditLogReason),
 		}
 
-		res, err := database.DB.Model(&mute).
+		res, err := database.DB.NewUpdate().
+			Model(&mute).
 			Set("end_date = ?end_date").
 			Where("user_id = ?user_id").
 			Where("role_id = ?role_id").
 			Where("guild_id = ?guild_id").
-			Update()
+			Exec(context.Background())
 
 		logger.LogIfErr(err)
-		if res.RowsAffected() == 0 { // No entry yet
-			_, err := database.DB.Model(&mute).Insert()
+		if i, _ := res.RowsAffected(); i == 0 { // No entry yet
+			_, err = database.DB.NewInsert().Model(&mute).Exec(context.Background())
 			logger.LogIfErr(err)
 		}
 
@@ -268,10 +275,11 @@ func unmute(mute database.Mute, reason api.AuditLogReason) error {
 	if err != nil {
 		return err
 	} else {
-		_, err = database.DB.Model(&mute).
+		_, err = database.DB.NewDelete().
+			Model(&mute).
 			Where("user_id = ?user_id").
 			Where("role_id = ?role_id").
-			Delete()
+			Exec(context.Background())
 		return err
 	}
 }

@@ -1,27 +1,27 @@
 package database
 
 import (
+	"context"
+
 	"github.com/diamondburned/arikawa/v3/discord"
-	"github.com/go-pg/pg/v10/orm"
 )
 
 type Mute struct {
-	UserID  discord.UserID `pg:",notnull"`
-	RoleID  discord.RoleID `pg:",notnull"`
-	GuildID discord.GuildID `pg:",notnull"`
-	Reason  string `pg:",notnull"`
+	UserID  discord.UserID  `bun:",notnull"`
+	RoleID  discord.RoleID  `bun:",notnull"`
+	GuildID discord.GuildID `bun:",notnull"`
+	Reason  string          `bun:",notnull"`
 	EndDate int64
 }
 
 func createSchema() error {
+	ctx := context.Background()
 	models := []interface{}{
 		(*Mute)(nil),
 	}
 
 	for _, model := range models {
-		if err := DB.Model(model).CreateTable(&orm.CreateTableOptions{
-			IfNotExists: true,
-		}); err != nil {
+		if _, err := DB.NewCreateTable().IfNotExists().Model(model).Exec(ctx); err != nil {
 			return err
 		}
 	}
