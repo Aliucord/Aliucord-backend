@@ -18,8 +18,7 @@ func initVoiceTextChatLocker() {
 	}
 
 	s.PreHandler = handler.New()
-	s.PreHandler.Synchronous = true
-	s.PreHandler.AddHandler(func(state *gateway.VoiceStateUpdateEvent) {
+	s.PreHandler.AddSyncHandler(func(state *gateway.VoiceStateUpdateEvent) {
 		if state.ChannelID == cfg.Voice {
 			logger.LogIfErr(s.EditChannelPermission(cfg.Text, discord.Snowflake(state.UserID), api.EditChannelPermissionData{
 				Type:           discord.OverwriteMember,

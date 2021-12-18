@@ -8,7 +8,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
-	"github.com/diamondburned/arikawa/v3/utils/json/option"
 )
 
 func init() {
@@ -101,6 +100,7 @@ func processStarCount(msg *discord.Message, count int) {
 	for _, m := range messages {
 		if m.Author.ID == s.Ready().User.ID &&
 			len(m.Embeds) == 1 &&
+			m.Embeds[0].Footer != nil &&
 			strings.HasSuffix(m.Embeds[0].Footer.Text, msg.ID.String()) {
 			starboardMsg = &m
 			break
@@ -117,35 +117,18 @@ func processStarCount(msg *discord.Message, count int) {
 	content := fmt.Sprintf("%s %d | <#%s>", getStarboardEmote(count), count, msg.ChannelID)
 	if starboardMsg != nil {
 		if starboardMsg.Content != content {
-			embed := generateMessageEmbed(msg)
-			if len(starboardMsg.Components) == 0 { // old message without jump button
-				components := generateJumpButton(msg.URL())
-				s.EditMessageComplex(config.Starboard.Channel, starboardMsg.ID, api.EditMessageData{
-					Content:    option.NewNullableString(content),
-					Embeds:     &[]discord.Embed{embed},
-					Components: &components,
-				})
-			} else {
-				s.EditMessage(config.Starboard.Channel, starboardMsg.ID, content, embed)
-			}
+			s.EditMessage(config.Starboard.Channel, starboardMsg.ID, content, generateMessageEmbed(msg))
 		}
 	} else {
 		s.SendMessageComplex(config.Starboard.Channel, api.SendMessageData{
-			Content:    content,
-			Embeds:     []discord.Embed{generateMessageEmbed(msg)},
-			Components: generateJumpButton(msg.URL()),
+			Content: content,
+			Embeds:  []discord.Embed{generateMessageEmbed(msg)},
+			Components: discord.Components(&discord.ButtonComponent{
+				Label: "Jump",
+				Style: discord.LinkButtonStyle(msg.URL()),
+			}),
 		})
 	}
-}
-
-func generateJumpButton(url string) []discord.Component {
-	return []discord.Component{&discord.ActionRowComponent{
-		Components: []discord.Component{&discord.ButtonComponent{
-			Label: "Jump",
-			URL:   url,
-			Style: discord.LinkButton,
-		}},
-	}}
 }
 
 func generateMessageEmbed(msg *discord.Message) discord.Embed {

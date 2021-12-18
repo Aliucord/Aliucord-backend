@@ -20,14 +20,10 @@ var (
 func StartBot(cfg *common.Config) {
 	config = cfg.Bot
 
-	s, err := state.New("Bot " + config.Token); logger.PanicIfErr(err)
-	s.Gateway.ErrorLog = func(err error) {
-		logger.Println("Error:", err)
-	}
-
+	s = state.New("Bot " + config.Token)
 	modules.InitAllModules(logger, config, s)
 
-	s.Gateway.AddIntents(gateway.IntentDirectMessages |
+	s.AddIntents(gateway.IntentDirectMessages |
 		gateway.IntentGuilds |
 		gateway.IntentGuildMembers |
 		gateway.IntentGuildVoiceStates |
@@ -35,7 +31,7 @@ func StartBot(cfg *common.Config) {
 		gateway.IntentGuildMessageReactions,
 	)
 
-	err = s.Open(context.Background()); logger.PanicIfErr(err)
+	logger.PanicIfErr(s.Open(context.Background()))
 
 	me, err := s.Me()
 	if err != nil {
