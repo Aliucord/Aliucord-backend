@@ -35,7 +35,7 @@ const (
 	MentionHelp      = "Rule 9: Don't dm or mention for support"
 	ElaborateHelp    = "We can't help you if you don't tell us your issue. "
 	InstallPlugins   = "https://cdn.discordapp.com/attachments/811261298997460992/875552420363636766/21-08-13-03-31-20.mp4" //people would rather watch a video than opening the docu so
-	InstallThemes    = "Themer plugin <https://discord.com/channels/811255666990907402/811261298997460992/845243103757467658>"
+	InstallThemes    = "https://cdn.discordapp.com/attachments/868419532992172073/921815801214947338/20211218_360p.mp4"
 	CreateThemes     = "Read this documentation: https://github.com/Aliucord/documentation/tree/main/theme-dev"
 	SearchThemes     = "Check <#824357609778708580> and search on there, maybe there's the theme you want"
 	AliuCrash        = "Send crashlogs (check Crashes in Settings, and copy the most recent), if there aren't any crashlogs, then we can't do nothing about it. (If you want, you can try send a logcat, check <https://pastebin.com/pNhXwhrd>)"
