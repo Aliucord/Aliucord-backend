@@ -271,15 +271,16 @@ func startUnmuteTimer(mute database.Mute) {
 }
 
 func unmute(mute database.Mute, reason api.AuditLogReason) error {
-	err := s.RemoveRole(mute.GuildID, mute.UserID, mute.RoleID, reason)
-	if err != nil {
-		return err
-	} else {
-		_, err = database.DB.NewDelete().
-			Model(&mute).
-			Where("user_id = ?user_id").
-			Where("role_id = ?role_id").
-			Exec(context.Background())
-		return err
+	if member, err := s.Member(mute.GuildID, mute.UserID); err == nil && common.HasRole(member.RoleIDs, mute.RoleID) {
+		if err = s.RemoveRole(mute.GuildID, mute.UserID, mute.RoleID, reason); err != nil {
+			return err
+		}
 	}
+
+	_, err := database.DB.NewDelete().
+		Model(&mute).
+		Where("user_id = ?user_id").
+		Where("role_id = ?role_id").
+		Exec(context.Background())
+	return err
 }
