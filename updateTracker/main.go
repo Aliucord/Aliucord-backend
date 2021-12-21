@@ -3,6 +3,8 @@ package updateTracker
 import (
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -141,6 +143,13 @@ func check(channel string, cfg common.GooglePlayChannelConfig) {
 }
 
 func GetDownloadURL(version int, bypass bool) (url string, err error) {
+	if !bypass {
+		apkName := "com.discord-" + strconv.Itoa(version) + ".apk"
+		if _, err = os.Stat(config.UpdateTracker.DiscordJADX.WorkDir + "/apk/" + apkName); err == nil {
+			return config.Origin + "/download/direct/" + apkName, nil
+		}
+	}
+
 	if url, ok := config.Mirrors[version]; ok {
 		return url, nil
 	}
