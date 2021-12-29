@@ -35,8 +35,9 @@ const (
 	MentionHelp      = "Rule 9: Don't dm or mention for support"
 	ElaborateHelp    = "We can't help you if you don't tell us your issue. "
 	InstallPlugins   = "https://cdn.discordapp.com/attachments/811261298997460992/875552420363636766/21-08-13-03-31-20.mp4" //people would rather watch a video than opening the docu so
-	InstallThemes    = "Themer plugin <https://discord.com/channels/811255666990907402/811261298997460992/845243103757467658>"
+	InstallThemes    = "https://cdn.discordapp.com/attachments/875213883776847873/925755609964486737/J7_2021_12_29_09_20_56.mp4" //not a shitpost video
 	CreateThemes     = "Read this documentation: https://github.com/Aliucord/documentation/tree/main/theme-dev"
+	FullTransparency = "1. Are you using a theme that requires full transparency? If the answer is no, then that's the problem. Normally in the description says what transparency you need to use. 2. Are you using a custom ROM? If the answer is yes, then we can't do nothing about it."
 	SearchThemes     = "Check <#824357609778708580> and search on there, maybe there's the theme you want"
 	AliuCrash        = "Send crashlogs (check Crashes in Settings, and copy the most recent), if there aren't any crashlogs, then we can't do nothing about it. (If you want, you can try send a logcat, check <https://pastebin.com/pNhXwhrd>)"
 	FreeNitro        = "Not possible. Nitrospoof exists for \"free\" emotes, for anything else buy nitro."
@@ -65,20 +66,21 @@ func initAutoReplies() {
 	}
 
 	autoRepliesRegex := map[*regexp.Regexp]string{
-		r("^(?:i need )?help(?: me)?$"):               ElaborateHelp,
-		r("<@!?\\d{2,19}> help"):                      MentionHelp,
-		r("help <@!?\\d{2,19}>"):                      MentionHelp,
-		r("animated (profile|avatar|pfp)"):            FreeNitro,
-		r("^is there a plugin .+"):                    FindPlugin,
-		r("^where(?: i)?s(?: the )?.+ plugin$"):       FindPlugin,
-		r("^can (?:anyone|you) help(?: me)?\\??$"):    JustAsk,
-		r("can'?t download plugin ?downloader"):       PluginDownloader,
-		r("where(?: i)s(?: the)? plugin ?downloader"): PluginDownloader,
-		r("how (to|do I|do you) install plugins"):     InstallPlugins,
-		r("how (to|do I|do you) install themes"):      InstallThemes,
-		r("how (to|do I|do you|can i|) create themes"):CreateThemes,
-		r("(does anyone know|is there) a theme that"): SearchThemes,
-		r("my aliucord (crashed|keeps crashing|crash|crashes)"): AliuCrash,
+		r("^(?:i need )?help(?: me)?$"):                                         ElaborateHelp,
+		r("<@!?\\d{2,19}> help"):                                                MentionHelp,
+		r("help <@!?\\d{2,19}>"):                                                MentionHelp,
+		r("animated (profile|avatar|pfp)"):                                      FreeNitro,
+		r("^is there a plugin .+"):                                              FindPlugin,
+		r("^where(?: i)?s(?: the )?.+ plugin$"):                                 FindPlugin,
+		r("^can (?:anyone|you) help(?: me)?\\??$"):                              JustAsk,
+		r("can'?t (download|find) plugin ?downloader"):                          PluginDownloader,
+		r("where(?: i)s(?: the)? plugin ?downloader"):                           PluginDownloader,
+		r("how (to|do I|do you) (install|download|get) (plugin|plugins)"):       InstallPlugins,
+		r("how (to|do I|do you) (install|download|apply|get) (theme|themes)"):   InstallThemes,
+		r("how (to|do I|do you|can i|) create themes"):                          CreateThemes,
+		r("(does anyone know|is there) a theme that"):                           SearchThemes,
+		r("(my aliucord|aliucord) (crashed|keeps crashing|crash|crashes)"):      AliuCrash,
+		r("^(why|with) full transparency (is not|not|will not) (work|working)"): FullTransparency,
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
