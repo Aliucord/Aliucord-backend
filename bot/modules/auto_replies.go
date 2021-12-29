@@ -35,7 +35,7 @@ const (
 	MentionHelp      = "Rule 9: Don't dm or mention for support"
 	ElaborateHelp    = "We can't help you if you don't tell us your issue. "
 	InstallPlugins   = "https://cdn.discordapp.com/attachments/811261298997460992/875552420363636766/21-08-13-03-31-20.mp4" //people would rather watch a video than opening the docu so
-	InstallThemes    = "https://cdn.discordapp.com/attachments/875213883776847873/925755609964486737/J7_2021_12_29_09_20_56.mp4" //not a shitpost video
+	InstallThemes    = "https://cdn.discordapp.com/attachments/811263527239024640/925834650289594438/J7_2021_12_29_14_34_52.mp4" //not a shitpost video, now with themer install
 	CreateThemes     = "Read this documentation: https://github.com/Aliucord/documentation/tree/main/theme-dev"
 	FullTransparency = "1. Are you using a theme that requires full transparency? If the answer is no, then that's the problem. Normally in the description says what transparency you need to use. 2. Are you using a custom ROM? If the answer is yes, then we can't do nothing about it."
 	SearchThemes     = "Check <#824357609778708580> and search on there, maybe there's the theme you want"
