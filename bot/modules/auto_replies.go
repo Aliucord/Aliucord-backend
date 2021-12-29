@@ -80,7 +80,7 @@ func initAutoReplies() {
 		r("how (to|do I|do you|can i|) create themes"):                          CreateThemes,
 		r("(does anyone know|is there) a theme that"):                           SearchThemes,
 		r("(?:my )?aliucord (?:crashed|keeps crashing|crash|crashes)"):      AliuCrash,
-		r("^(why|with) full transparency (is not|not|will not) (work|working)"): FullTransparency,
+		r("^(?:why|with) (?:is )?full transparency (?:is not|not|will not) (work|working)"): FullTransparency,
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
