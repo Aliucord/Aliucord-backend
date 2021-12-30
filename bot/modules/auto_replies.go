@@ -75,7 +75,7 @@ func initAutoReplies() {
 		r("^can (?:anyone|you) help(?: me)?\\??$"):                                          JustAsk,
 		r("can'?t (download|find) plugin ?downloader"):                                      PluginDownloader,
 		r("where(?: i)s(?: the)? plugin ?downloader"):                                       PluginDownloader,
-		r("(?:where|how) (?:to|do I|do you) (?:install|download|get) (?:plugin|plugins)"):   InstallPlugins,
+		r("(?:where|how) (?:to|do I|do you) (?:install|download|get) (?:plugin|plugins|a plugin)"):   InstallPlugins,
 		r("how (?:to|do I|do you) (?:install|download|apply|get) (?:theme|themes)"):         InstallThemes,
 		r("how (?:to |do I |do you |can i )?create themes"):                                 CreateThemes,
 		r("(?:does anyone know |is there )?a theme that"):                                   SearchThemes,
