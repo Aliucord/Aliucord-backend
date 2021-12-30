@@ -65,20 +65,20 @@ func initAutoReplies() {
 	}
 
 	autoRepliesRegex := map[*regexp.Regexp]string{
-		r("^(?:i need )?help(?: me)?$"):               ElaborateHelp,
-		r("<@!?\\d{2,19}> help"):                      MentionHelp,
-		r("help <@!?\\d{2,19}>"):                      MentionHelp,
-		r("animated (profile|avatar|pfp)"):            FreeNitro,
-		r("^is there a plugin .+"):                    FindPlugin,
-		r("^where(?: i)?s(?: the )?.+ plugin$"):       FindPlugin,
-		r("^can (?:anyone|you) help(?: me)?\\??$"):    JustAsk,
-		r("can'?t download plugin ?downloader"):       PluginDownloader,
-		r("where(?: i)s(?: the)? plugin ?downloader"): PluginDownloader,
-		r("how (to|do I|do you) install plugins"):     InstallPlugins,
-		r("how (to|do I|do you) install themes"):      InstallThemes,
-		r("how (to|do I|do you|can i|) create themes"):CreateThemes,
-		r("(does anyone know|is there) a theme that"): SearchThemes,
-		r("my aliucord (crashed|keeps crashing|crash|crashes)"): AliuCrash,
+		r("^(?:i need )?help(?: me)?$"):                                               ElaborateHelp,
+		r("<@!?\\d{2,19}> help"):                                                      MentionHelp,
+		r("help <@!?\\d{2,19}>"):                                                      MentionHelp,
+		r("animated (profile|avatar|pfp)"):                                            FreeNitro,
+		r("^is there a plugin .+"):                                                    FindPlugin,
+		r("^where(?: i)?s(?: the )?.+ plugin$"):                                       FindPlugin,
+		r("^can (?:anyone|you) help(?: me)?\\??$"):                                    JustAsk,
+		r("can'?t download plugin ?downloader"):                                       PluginDownloader,
+		r("where(?: i)s(?: the)? plugin ?downloader"):                                 PluginDownloader,
+		r("(how|where) (to|do|can) ?(you|I)? (install|download)(?: a)? plugin(?:s)?"): InstallPlugins,
+		r("(how|where) (to|do|can) ?(you|I)? (install|download)(?: a)? theme(?:s)"):   InstallThemes,
+		r("how (to|do I|do you|can i|) create themes"):                                CreateThemes,
+		r("(does anyone know|is there) a theme that"):                                 SearchThemes,
+		r("my aliucord (crashed|keeps crashing|crash|crashes)"):                       AliuCrash,
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
