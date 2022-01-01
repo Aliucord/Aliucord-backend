@@ -40,7 +40,7 @@ const (
 	FullTransparency = "1. Are you using a theme that requires full transparency? If the answer is no, then that's the problem. Normally in the description says what transparency you need to use. 2. Are you using a custom ROM? If the answer is yes, then we can't do nothing about it."
 	SearchThemes     = "Check <#824357609778708580> and search on there, maybe there's the theme you want"
 	AliuCrash        = "Send crashlogs (check Crashes in Settings, and copy the most recent), if there aren't any crashlogs, then we can't do nothing about it. (If you want, you can try send a logcat, check <https://pastebin.com/pNhXwhrd>)"
-	FreeNitro        = "Not possible. Nitrospoof exists for \"free\" emotes, for anything else buy nitro."
+	FreeNitro        = "Not possible. UserBG exists for using a custom banner (read the plugin's description), for anything else buy nitro."
 	Usage            = "Go to the plugin's repository and read the readme. Chances are the dev added a description."
 	BetterInternet   = "This happens when you have an old/misbehaving router. Use mobile data (~120mb usage) or maybe a VPN (*or just get better internet*)."
 	PluginDownloader = "PluginDownloader is now a part of Aliucord. (It won't be present in the plugin list) If the option to download plugins is still missing, update Aliucord."
