@@ -96,7 +96,7 @@ func initAutoReplies() {
 		}
 
 		for _, role := range msg.Member.RoleIDs {
-			if common.HasRole(cfg.IgnoredRoles, role) {
+			if common.HasRole(config.RoleIDs.IgnoredRoles, role) {
 				return
 			}
 		}

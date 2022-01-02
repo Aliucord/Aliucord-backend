@@ -10,7 +10,8 @@
       "prdMuted": 0,
       "devMuted": 0,
       "reactionMuted": 0,
-      "attachmentMuted": 0
+      "attachmentMuted": 0,
+      "ignoredRoles": [0]
     },
     "starboard": {
       "enabled": true,
@@ -32,12 +33,12 @@
     "normalizeNicknames": true,
     "autoReplyConfig": {
       "enabled": true,
-      "ignoredRoles": [0],
       "prd": 0,
       "pluginsList": 0,
       "newPlugins": 0,
       "supportCategory": 0
-    }
+    },
+    "antiZip": true
   },
   "database": {
     "addr": "127.0.0.1:5432",

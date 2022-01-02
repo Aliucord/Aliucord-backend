@@ -34,6 +34,7 @@ type (
 		AntiSelfbot         bool
 		NormalizeNicknames  bool
 		AutoReplyConfig     *AutoReplyConfig
+		AntiZip             bool
 	}
 
 	RoleIDsConfig struct {
@@ -43,6 +44,7 @@ type (
 		DevMuted        discord.RoleID
 		ReactionMuted   discord.RoleID
 		AttachmentMuted discord.RoleID
+		IgnoredRoles    []discord.RoleID
 	}
 
 	StarboardConfig struct {
@@ -108,8 +110,6 @@ type (
 
 	AutoReplyConfig struct {
 		ToggleableModule
-
-		IgnoredRoles []discord.RoleID
 
 		PRD         discord.ChannelID
 		PluginsList discord.ChannelID
