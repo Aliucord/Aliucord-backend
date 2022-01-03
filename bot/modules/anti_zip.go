@@ -11,6 +11,8 @@ func init() {
 	modules = append(modules, initAntiZip)
 }
 
+var blacklistedExts = []string{"zip", "exe", "dll", "jar"}
+
 func initAntiZip() {
 	if !config.AntiZip {
 		return
@@ -28,12 +30,15 @@ func initAntiZip() {
 		}
 
 		for _, attachment := range msg.Attachments {
-			if strings.HasSuffix(attachment.Filename, ".zip") {
-				err := s.DeleteMessage(msg.ChannelID, msg.ID, "Sent zip")
-				if err != nil {
-					logger.Println(err)
+			for _, ext := range blacklistedExts {
+				if strings.HasSuffix(attachment.Filename, ext) {
+					err := s.DeleteMessage(msg.ChannelID, msg.ID, "Sent zip")
+					if err != nil {
+						logger.Println(err)
+					}
+					
+					return
 				}
-				return
 			}
 		}
 	})
