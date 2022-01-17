@@ -32,11 +32,10 @@ func initAntiZip() {
 		for _, attachment := range msg.Attachments {
 			for _, ext := range blacklistedExts {
 				if strings.HasSuffix(attachment.Filename, ext) {
-					err := s.DeleteMessage(msg.ChannelID, msg.ID, "Sent zip")
+					err := s.DeleteMessage(msg.ChannelID, msg.ID, "Sent unallowed attachment")
 					if err != nil {
 						logger.Println(err)
 					}
-					
 					return
 				}
 			}
