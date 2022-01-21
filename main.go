@@ -64,7 +64,7 @@ func main() {
 	})
 
 	r.GET("/links/{platform}", func(ctx *fasthttp.RequestCtx) {
-		redirect := redirects["platform"]
+		redirect := redirects[ctx.UserValue("platform").(string)]
 		if redirect != "" {
 			ctx.Redirect(redirect, fasthttp.StatusMovedPermanently)
 		} else {
