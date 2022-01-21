@@ -17,6 +17,7 @@ type (
 		DisableAptoide []int
 		Port           string
 		Origin         string
+		PatreonSecret  string
 	}
 
 	BotConfig struct {

@@ -14,6 +14,13 @@ type Mute struct {
 	EndDate int64
 }
 
+type Donor struct {
+	UserID  discord.UserID `bun:",notnull"`
+	SubTier int            `bun:",notnull"`
+	CustomRoleID discord.RoleID
+	CustomRole2ID discord.RoleID
+}
+
 func createSchema() error {
 	ctx := context.Background()
 	models := []interface{}{

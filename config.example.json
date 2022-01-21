@@ -74,5 +74,6 @@
   "mirrors": {},
   "disableAptoide": [0],
   "port": "3000",
-  "origin": "http://localhost:3000"
+  "origin": "http://localhost:3000",
+  "patreonSecret": "Take from https://www.patreon.com/portal/registration/register-webhooks"
 }

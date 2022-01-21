@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/valyala/fasthttp"
 )
 
 type ExtendedLogger struct {
@@ -45,4 +46,9 @@ func HasUser(users []discord.UserID, user discord.UserID) bool {
 		}
 	}
 	return false
+}
+
+func FailRequest(ctx *fasthttp.RequestCtx, code int) {
+	ctx.SetStatusCode(code)
+	_, _ = ctx.WriteString(fasthttp.StatusMessage(code))
 }

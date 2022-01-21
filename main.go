@@ -12,8 +12,15 @@ import (
 	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/Aliucord/Aliucord-backend/database"
 	"github.com/Aliucord/Aliucord-backend/updateTracker"
+	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
+
+var redirects = map[string]string{
+	"github":  "https://github.com/Aliucord",
+	"discord": "https://discord.gg/EsNDvBaHVU",
+	"patreon": "https://patreon.com/Aliucord",
+}
 
 type fastHttpLogger struct{}
 
@@ -30,6 +37,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	common.PatreonSecret = []byte(config.PatreonSecret)
 
 	database.InitDB(config.Database)
 	if config.Bot.Enabled {
@@ -44,53 +52,54 @@ func main() {
 		PathRewrite: fasthttp.NewPathSlashesStripper(2),
 	}
 	fsHandler := fs.NewRequestHandler()
+
+	r := router.New()
+
+	r.GET("/", func(ctx *fasthttp.RequestCtx) {
+		ctx.Response.Header.Set("Content-Type", "text/html; charset=utf-8")
+		fmt.Fprint(
+			ctx,
+			"<html><head><title>Aliucord</title></head><body>High quality™ temp page.<br><a href=\"/links/github\">[GitHub Org]</a> <a href=\"/links/discord\">[Discord Server]</a></body></html>",
+		)
+	})
+
+	r.GET("/links/{platform}", func(ctx *fasthttp.RequestCtx) {
+		redirect := redirects["platform"]
+		if redirect != "" {
+			ctx.Redirect(redirect, fasthttp.StatusMovedPermanently)
+		} else {
+			common.FailRequest(ctx, fasthttp.StatusNotFound)
+		}
+	})
+
+	r.GET("/download/discord", func(ctx *fasthttp.RequestCtx) {
+		v := string(ctx.QueryArgs().Peek("v"))
+		if v == "" {
+			missingParams(ctx, []string{"v - discord version code"})
+			return
+		}
+		version, err := strconv.Atoi(v)
+		if err != nil {
+			missingParams(ctx, []string{"v - discord version code"})
+			return
+		}
+		url, err := updateTracker.GetDownloadURL(version, false)
+		if err != nil {
+			ctx.SetStatusCode(fasthttp.StatusNotFound)
+			ctx.WriteString("apk not found: " + err.Error())
+			return
+		}
+		ctx.Redirect(url, fasthttp.StatusFound)
+	})
+
+	r.GET("/download/direct/{filepath:*}", fsHandler)
+	r.POST("/patreon-webhook", common.HandlePatreonWebhook)
+
 	server := fasthttp.Server{
-		Logger: &fastHttpLogger{},
-		Handler: func(ctx *fasthttp.RequestCtx) {
-			path := string(ctx.Path())
-			switch path {
-			case "/":
-				ctx.Response.Header.Set("Content-Type", "text/html; charset=utf-8")
-				fmt.Fprint(
-					ctx,
-					"<html><head><title>Aliucord</title></head><body>High quality™ temp page.<br><a href=\"/links/github\">[GitHub Org]</a> <a href=\"/links/discord\">[Discord Server]</a></body></html>",
-				)
-			case "/links/github":
-				ctx.Redirect("https://github.com/Aliucord", fasthttp.StatusMovedPermanently)
-			case "/links/discord":
-				ctx.Redirect("https://discord.gg/EsNDvBaHVU", fasthttp.StatusMovedPermanently)
-			case "/download/discord":
-				v := string(ctx.QueryArgs().Peek("v"))
-				if v == "" {
-					missingParams(ctx, []string{"v - discord version code"})
-					return
-				}
-				version, err := strconv.Atoi(v)
-				if err != nil {
-					missingParams(ctx, []string{"v - discord version code"})
-					return
-				}
-				url, err := updateTracker.GetDownloadURL(version, false)
-				if err != nil {
-					ctx.SetStatusCode(fasthttp.StatusNotFound)
-					ctx.WriteString("apk not found: " + err.Error())
-					return
-				}
-				ctx.Redirect(url, fasthttp.StatusFound)
-			default:
-				if strings.HasPrefix(path, "/download/direct/") {
-					fsHandler(ctx)
-				} else {
-					ctx.SetStatusCode(fasthttp.StatusNotFound)
-					ctx.WriteString(fasthttp.StatusMessage(fasthttp.StatusNotFound))
-				}
-			}
-		},
+		Logger:  &fastHttpLogger{},
+		Handler: r.Handler,
 	}
-	err = server.ListenAndServe(":" + config.Port)
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Fatal(server.ListenAndServe(":" + config.Port))
 }
 
 func missingParams(ctx *fasthttp.RequestCtx, params []string) {
