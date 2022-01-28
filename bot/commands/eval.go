@@ -27,11 +27,19 @@ func init() {
 }
 
 func evalCommand(ctx *CommandContext) (*discord.Message, error) {
+	code := strings.Join(ctx.Args, " ")
+	if strings.HasPrefix(code, "```") {
+		code = code[3:len(code) - 3]
+		if strings.HasPrefix(code, "go\n") {
+			code = code[3:]
+		}
+	}
+
 	e := core.Import(env.NewEnv())
 	_ = e.Define("s", s)
 	_ = e.Define("msg", ctx.Message)
 	_ = e.Define("ctx", ctx)
-	ret, err := vm.Execute(e, nil, strings.Join(ctx.Args, " "))
+	ret, err := vm.Execute(e, nil, code)
 	if err != nil {
 		return ctx.ReplyNoMentions("ERROR:```go\n" + err.Error() + "```")
 	}

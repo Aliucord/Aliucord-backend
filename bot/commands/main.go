@@ -38,7 +38,9 @@ func InitCommands(botLogger *common.ExtendedLogger, botConfig *common.BotConfig,
 		if prefix == "" {
 			return
 		}
-		args := strings.Fields(msg.Content[len(prefix):])
+		args := strings.FieldsFunc(msg.Content[len(prefix):], func(r rune) bool {
+			return r == ' '
+		})
 		if len(args) == 0 {
 			return
 		}
