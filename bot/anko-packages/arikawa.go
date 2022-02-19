@@ -1457,7 +1457,6 @@ func initArikawaVoiceVoicegateway() {
 	env.PackageTypes["github.com/diamondburned/arikawa/v3/voice/voicegateway"] = map[string]reflect.Type{
 		"ClientConnectEvent":      reflect.TypeOf((*voicegateway.ClientConnectEvent)(nil)).Elem(),
 		"ClientDisconnectEvent":   reflect.TypeOf((*voicegateway.ClientDisconnectEvent)(nil)).Elem(),
-		"Event":                   reflect.TypeOf((*voicegateway.Event)(nil)).Elem(),
 		"Gateway":                 reflect.TypeOf((*voicegateway.Gateway)(nil)).Elem(),
 		"HeartbeatAckEvent":       reflect.TypeOf((*voicegateway.HeartbeatAckEvent)(nil)).Elem(),
 		"HeartbeatCommand":        reflect.TypeOf((*voicegateway.HeartbeatCommand)(nil)).Elem(),

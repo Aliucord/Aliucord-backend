@@ -28,7 +28,7 @@
       "voice": 0,
       "text": 0
     },
-    "antiSelfbot": true,
+    "antiNitroScam": true,
     "normalizeNicknames": true,
     "autoReplyConfig": {
       "enabled": true,
