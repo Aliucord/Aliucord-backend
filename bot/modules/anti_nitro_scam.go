@@ -46,7 +46,6 @@ func initAntiNitroScam() {
 			continue
 
 		scam:
-			s.SendTextReply(msg.ChannelID, "HARAM", msg.ID)
 			// Ignore errors here since error indicates user has dms closed
 			dm, err := s.CreatePrivateChannel(msg.Author.ID)
 			if err == nil {
