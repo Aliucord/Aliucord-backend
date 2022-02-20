@@ -112,6 +112,12 @@ func (ctx *CommandContext) ReplyNoMentions(content string) (*discord.Message, er
 	})
 }
 
+func (ctx *CommandContext) ReplyErr(context string, err error) (*discord.Message, error) {
+	logger.Println("Err while " + context)
+	logger.Println(err)
+	return ctx.Reply("Something went wrong: ```\n" + err.Error() + "```")
+}
+
 func addCommand(cmd *Command) {
 	commandsCount++
 	commandsMap[cmd.Name] = cmd

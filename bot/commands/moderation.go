@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Aliucord/Aliucord-backend/bot/modules"
 	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/Aliucord/Aliucord-backend/database"
 	"github.com/diamondburned/arikawa/v3/api"
@@ -26,6 +27,17 @@ type nameAndID struct {
 }
 
 func initModCommands() {
+	addCommand(&Command{
+		Name:             "scamphrases",
+		Aliases:          []string{"phrases"},
+		RequiredArgCount: 1,
+		Description:      "Add/Remove or list scam phrases",
+		Usage:            "<list | add | remove> [phrase]",
+		ModOnly:          true,
+		OwnerOnly:        false,
+		Callback:         scamPhrasesCommand,
+	})
+
 	roles := []nameAndID{
 		{name: "supportmute", id: config.RoleIDs.SupportMuted},
 		{name: "devmute", id: config.RoleIDs.DevMuted},
@@ -96,6 +108,72 @@ func initModCommands() {
 		for _, mute := range mutes {
 			startUnmuteTimer(mute)
 		}
+	}
+}
+
+func scamPhrasesCommand(ctx *CommandContext) (*discord.Message, error) {
+	switch strings.ToLower(ctx.Args[0]) {
+	case "list":
+		var phrases []database.ScamPhrase
+		err := database.DB.NewSelect().
+			Model(&phrases).
+			Scan(context.Background())
+		if err != nil {
+			return ctx.ReplyErr("listing scam phrases", err)
+		}
+
+		var sb strings.Builder
+		for _, phrase := range phrases {
+			sb.WriteString(phrase.Phrase)
+			sb.WriteRune('\n')
+		}
+
+		if sb.Len() == 0 {
+			return ctx.Reply("No banned phrases")
+		}
+		return ctx.Reply("Banned phrases: ```\n" + sb.String() + "```")
+	case "add":
+		if len(ctx.Args) < 2 {
+			return ctx.Reply("Please specify a phrase")
+		}
+
+		res, err := database.DB.NewInsert().
+			Ignore(). // Ignore conflict
+			Model(&database.ScamPhrase{Phrase: strings.Join(ctx.Args[1:], " ")}).
+			Exec(context.Background())
+		if err != nil {
+			return ctx.ReplyErr("adding scam phrase", err)
+		}
+
+		affected, _ := res.RowsAffected()
+		if affected == 0 {
+			return ctx.Reply("No rows affected. Phrase already added?")
+		}
+
+		modules.UpdateScamTitles()
+		return ctx.Reply("Done!")
+	case "remove", "delete":
+		if len(ctx.Args) < 2 {
+			return ctx.Reply("Please specify a phrase")
+		}
+
+		res, err := database.DB.NewDelete().
+			Model((*database.ScamPhrase)(nil)).
+			Where("phrase = ?", strings.Join(ctx.Args[1:], " ")).
+			Exec(context.Background())
+		if err != nil {
+			return ctx.ReplyErr("removing scam phrase", err)
+		}
+
+		affected, _ := res.RowsAffected()
+		if affected == 0 {
+			return ctx.Reply("No rows affected. Phrase not added?")
+		}
+
+		modules.UpdateScamTitles()
+		return ctx.Reply("Done!")
+	default:
+		return ctx.Reply("No such subcommand: " + ctx.Args[0])
 	}
 }
 

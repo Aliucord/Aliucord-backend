@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/Aliucord/Aliucord-backend/bot"
+	"github.com/Aliucord/Aliucord-backend/bot/modules"
 	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/Aliucord/Aliucord-backend/database"
 	"github.com/Aliucord/Aliucord-backend/updateTracker"
@@ -33,6 +34,7 @@ func main() {
 
 	database.InitDB(config.Database)
 	if config.Bot.Enabled {
+		modules.UpdateScamTitles()
 		bot.StartBot(config)
 		defer bot.StopBot()
 	}
