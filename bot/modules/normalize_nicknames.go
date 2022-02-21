@@ -441,17 +441,22 @@ func NickOrUsername(nick, username string) string {
 	}
 }
 
-func NormalizeNickname(gid discord.GuildID, uid discord.UserID, nick string) bool {
-	normalizedNick := nick
+func Normalize(str string) string {
 	for _, replacement := range replacements {
 		for _, char := range replacement.special {
-			normalizedNick = strings.ReplaceAll(normalizedNick, char, replacement.normal)
+			str = strings.ReplaceAll(str, char, replacement.normal)
 		}
 	}
+	return str
+}
+
+func NormalizeNickname(gid discord.GuildID, uid discord.UserID, nick string) bool {
+	normalizedNick := Normalize(nick)
 
 	if normalizedNick != nick {
 		data := api.ModifyMemberData{Nick: option.NewString(normalizedNick), AuditLogReason: api.AuditLogReason("Normalize nickname")}
-		err := s.ModifyMember(gid, uid, data); logger.LogIfErr(err)
+		err := s.ModifyMember(gid, uid, data)
+		logger.LogIfErr(err)
 		return true
 	}
 	return false

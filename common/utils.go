@@ -21,6 +21,22 @@ func (logger *ExtendedLogger) LogIfErr(err error) {
 	}
 }
 
+// LogWithCtxIfErr logs one or more errors with context.
+// Context should be simple description with -ing verb like
+// "adding role" (will be logged as "Exception while adding role")
+func (logger *ExtendedLogger) LogWithCtxIfErr(context string, errs ...error) {
+	hasLogged := false
+	for _, err := range errs {
+		if err != nil {
+			if !hasLogged {
+				logger.Println("Exception while " + context)
+				hasLogged = true
+			}
+			logger.Println("\t", err)
+		}
+	}
+}
+
 func (logger *ExtendedLogger) PanicIfErr(err error) {
 	if err != nil {
 		logger.Panic(err)

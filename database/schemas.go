@@ -14,14 +14,18 @@ type Mute struct {
 	EndDate int64
 }
 
+type ScamPhrase struct {
+	Phrase string `bun:",notnull,unique"`
+}
+
 func createSchema() error {
-	ctx := context.Background()
 	models := []interface{}{
 		(*Mute)(nil),
+		(*ScamPhrase)(nil),
 	}
 
 	for _, model := range models {
-		if _, err := DB.NewCreateTable().IfNotExists().Model(model).Exec(ctx); err != nil {
+		if _, err := DB.NewCreateTable().IfNotExists().Model(model).Exec(context.Background()); err != nil {
 			return err
 		}
 	}
