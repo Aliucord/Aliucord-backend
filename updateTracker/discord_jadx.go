@@ -17,7 +17,7 @@ func Extract(channel string, app *gplayapi.App) error {
 		app.VersionCode,
 		cfg.WorkDir,
 		repo,
-		admh.GetDefaultJadxFlags(),
+		admh.GetDefaultJadxOptions(),
 		DownloadUrlResolver,
 	)
 	if err != nil {
