@@ -44,14 +44,15 @@ func initGithubLines() {
 				}
 
 				fileNameIdx := strings.LastIndex(path, "/") + 1
+				fileName := path
 				if fileNameIdx != 0 {
-					fileName := path[fileNameIdx:]
-					sb.WriteString("**" + fileName + "#" + start)
-					if end != "" {
-						sb.WriteString("-" + end)
-					}
-					sb.WriteString("**\n")
+					fileName = path[fileNameIdx:]
 				}
+				sb.WriteString("**" + fileName + ext + "#" + start)
+				if end != "" {
+					sb.WriteString("-" + end)
+				}
+				sb.WriteString("**\n")
 
 				sb.WriteString("```")
 				if len(ext) > 1 {
