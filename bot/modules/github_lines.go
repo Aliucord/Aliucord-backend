@@ -7,7 +7,10 @@ import (
 	"strings"
 
 	"github.com/Aliucord/Aliucord-backend/common"
+	"github.com/diamondburned/arikawa/v3/api"
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/valyala/fasthttp"
 )
 
@@ -15,7 +18,7 @@ const maxContentLength = 5e6 // 5MB
 const maxCharCount = 1000
 
 var client *fasthttp.Client
-var githubLinesRegex = regexp.MustCompile(`https?://github\.com/([A-Za-z0-9\-_.]+)/([A-Za-z0-9\-_.]+)/(?:blob|tree)/(.+?)/(.+?)(\.\S+)?#L(\d+)[-~]?L?(\d*)`)
+var githubLinesRegex = regexp.MustCompile(`https?://github\.com/([A-Za-z0-9\-_.]+)/([A-Za-z0-9\-_.]+)/(?:blob|tree)/(\S+?)/(\S+?)(\.\S+)?#L(\d+)[-~]?L?(\d*)`)
 
 func init() {
 	modules = append(modules, initGithubLines)
@@ -63,7 +66,11 @@ func initGithubLines() {
 
 			length := sb.Len()
 			if length > 0 && length < maxCharCount {
-				_, err := s.SendTextReply(msg.ChannelID, sb.String(), msg.ID)
+				_, err := s.SendMessageComplex(msg.ChannelID, api.SendMessageData{
+					Content:         sb.String(),
+					AllowedMentions: &api.AllowedMentions{RepliedUser: option.False},
+					Reference:       &discord.MessageReference{MessageID: msg.ID},
+				})
 				logger.LogWithCtxIfErr("embedding github lines", err)
 			}
 		}
