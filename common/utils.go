@@ -3,6 +3,7 @@ package common
 import (
 	"log"
 	"os"
+	"unicode"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 )
@@ -61,4 +62,13 @@ func HasUser(users []discord.UserID, user discord.UserID) bool {
 		}
 	}
 	return false
+}
+
+func IsAlpha(s string) bool {
+	for _, r := range s {
+		if !unicode.IsLetter(r) {
+			return false
+		}
+	}
+	return true
 }
