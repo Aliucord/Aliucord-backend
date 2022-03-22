@@ -43,6 +43,9 @@ func initGithubLines() {
 					continue
 				}
 
+				content = strings.ReplaceAll(content, "`", "`\u200b")
+				content = strings.ReplaceAll(content, "@", "@\u200b")
+
 				fileNameIdx := strings.LastIndex(path, "/") + 1
 				fileName := path
 				if fileNameIdx != 0 {
