@@ -133,7 +133,7 @@ func getContent(url, startStr, endStr string) string {
 	if end == 0 && lineCount >= start {
 		return lines[start-1]
 	}
-	if lineCount >= end {
+	if lineCount >= start && lineCount >= end {
 		return strings.Join(lines[start-1:end], "\n")
 	}
 
