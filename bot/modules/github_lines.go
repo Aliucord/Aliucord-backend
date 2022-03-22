@@ -122,7 +122,7 @@ func getContent(url, startStr, endStr string) string {
 	req.SetRequestURI(url)
 	req.Header.SetMethod(fasthttp.MethodGet)
 	err = client.Do(req, res)
-	if err != nil {
+	if err != nil || res.StatusCode() != 200 {
 		return ""
 	}
 
