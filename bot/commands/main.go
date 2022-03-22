@@ -11,6 +11,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"golang.org/x/exp/slices"
 )
 
 var (
@@ -49,13 +50,9 @@ func InitCommands(botLogger *common.ExtendedLogger, botConfig *common.BotConfig,
 		if command == nil {
 			return
 		}
-		if !common.HasUser(config.OwnerIDs, msg.Author.ID) {
-			if command.OwnerOnly {
-				return
-			}
-			if command.ModOnly && !common.HasRole(msg.Member.RoleIDs, config.RoleIDs.ModRole) {
-				return
-			}
+		if !slices.Contains(config.OwnerIDs, msg.Author.ID) &&
+			(command.OwnerOnly || command.ModOnly && !slices.Contains(msg.Member.RoleIDs, config.RoleIDs.ModRole)) {
+			return
 		}
 
 		ctx := CommandContext{

@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/Aliucord/Aliucord-backend/bot/modules"
-	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/Aliucord/Aliucord-backend/database"
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"golang.org/x/exp/slices"
 )
 
 var (
@@ -248,7 +248,7 @@ func makeUnmuteFunc(roleID discord.RoleID, muteName string) func(*CommandContext
 		if err != nil {
 			return ctx.Reply("I couldn't find that Member")
 		}
-		if !common.HasRole(member.RoleIDs, roleID) {
+		if !slices.Contains(member.RoleIDs, roleID) {
 			return ctx.Reply("That member isnt't " + muteName + "d")
 		}
 
@@ -349,7 +349,7 @@ func startUnmuteTimer(mute database.Mute) {
 }
 
 func unmute(mute database.Mute, reason api.AuditLogReason) error {
-	if member, err := s.Member(mute.GuildID, mute.UserID); err == nil && common.HasRole(member.RoleIDs, mute.RoleID) {
+	if member, err := s.Member(mute.GuildID, mute.UserID); err == nil && slices.Contains(member.RoleIDs, mute.RoleID) {
 		if err = s.RemoveRole(mute.GuildID, mute.UserID, mute.RoleID, reason); err != nil {
 			return err
 		}

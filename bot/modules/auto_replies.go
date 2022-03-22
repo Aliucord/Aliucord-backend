@@ -5,9 +5,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"golang.org/x/exp/slices"
 )
 
 func init() {
@@ -34,8 +34,8 @@ const (
 	CheckThePins     = "<a:checkpins:859804429536198676>"
 	MentionHelp      = "Rule 9: Don't dm or mention for support"
 	ElaborateHelp    = "We can't help you if you don't tell us your issue. "
-	InstallPlugins   = "https://cdn.discordapp.com/attachments/811261298997460992/875552420363636766/21-08-13-03-31-20.mp4" //people would rather watch a video than opening the docu so
-	InstallThemes    = "https://cdn.discordapp.com/attachments/865188789542060063/932412193159397457/HowToInstallAliucordThemes2.mp4" //ven owes me a million dollars, now with themer install
+	InstallPlugins   = "https://cdn.discordapp.com/attachments/811261298997460992/875552420363636766/21-08-13-03-31-20.mp4"           // people would rather watch a video than opening the docu so
+	InstallThemes    = "https://cdn.discordapp.com/attachments/865188789542060063/932412193159397457/HowToInstallAliucordThemes2.mp4" // ven owes me a million dollars, now with themer install
 	CreateThemes     = "Read this documentation: https://github.com/Aliucord/documentation/tree/main/theme-dev"
 	FullTransparency = "1. Are you using a theme that requires full transparency? If the answer is no, then that's the problem. Normally in the description says what transparency you need to use. 2. Are you using a custom ROM? If the answer is yes, then we can't do nothing about it."
 	SearchThemes     = "Check <#824357609778708580> and search on there, maybe there's the theme you want"
@@ -66,21 +66,21 @@ func initAutoReplies() {
 	}
 
 	autoRepliesRegex := map[*regexp.Regexp]string{
-		r("^(?:i need )?help(?: me)?$"):                                                     ElaborateHelp,
-		r("<@!?\\d{2,19}> help"):                                                            MentionHelp,
-		r("help <@!?\\d{2,19}>"):                                                            MentionHelp,
-		r("animated (profile|avatar|pfp)"):                                                  FreeNitro,
-		r("^is there a plugin .+"):                                                          FindPlugin,
-		r("^where(?: i)?s(?: the )?.+ plugin$"):                                             FindPlugin,
-		r("^can (?:anyone|you) help(?: me)?\\??$"):                                          JustAsk,
-		r("can'?t (download|find) plugin ?downloader"):                                      PluginDownloader,
-		r("where(?: i)s(?: the)? plugin ?downloader"):                                       PluginDownloader,
-		r("(?:where|how) (?:to|do I|do you) (?:install|download|get) (?:plugin|plugins|a plugin)"):   InstallPlugins,
-		r("how (?:to|do I|do you) (?:install|download|apply|get) (?:theme|themes)"):         InstallThemes,
-		r("how (?:to |do I |do you |can i )?create themes"):                                 CreateThemes,
-		r("(?:does anyone know |is there )?a theme that"):                                   SearchThemes,
-		r("(?:my )?aliucord (?:crashed|keeps crashing|crash|crashes)"):                      AliuCrash,
-		r("^(?:why|with) (?:is )?full transparency (?:is not|not|will not) (work|working)"): FullTransparency,
+		r("^(?:i need )?help(?: me)?$"):                ElaborateHelp,
+		r("<@!?\\d{2,19}> help"):                       MentionHelp,
+		r("help <@!?\\d{2,19}>"):                       MentionHelp,
+		r("animated (profile|avatar|pfp)"):             FreeNitro,
+		r("^is there a plugin .+"):                     FindPlugin,
+		r("^where(?: i)?s(?: the )?.+ plugin$"):        FindPlugin,
+		r("^can (?:anyone|you) help(?: me)?\\??$"):     JustAsk,
+		r("can'?t (download|find) plugin ?downloader"): PluginDownloader,
+		r("where(?: i)s(?: the)? plugin ?downloader"):  PluginDownloader,
+		r("(?:where|how) (?:to|do I|do you) (?:install|download|get) (?:plugin|plugins|a plugin)"): InstallPlugins,
+		r("how (?:to|do I|do you) (?:install|download|apply|get) (?:theme|themes)"):                InstallThemes,
+		r("how (?:to |do I |do you |can i )?create themes"):                                        CreateThemes,
+		r("(?:does anyone know |is there )?a theme that"):                                          SearchThemes,
+		r("(?:my )?aliucord (?:crashed|keeps crashing|crash|crashes)"):                             AliuCrash,
+		r("^(?:why|with) (?:is )?full transparency (?:is not|not|will not) (work|working)"):        FullTransparency,
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
@@ -98,7 +98,7 @@ func initAutoReplies() {
 		}
 
 		for _, role := range msg.Member.RoleIDs {
-			if common.HasRole(cfg.IgnoredRoles, role) {
+			if slices.Contains(cfg.IgnoredRoles, role) {
 				return
 			}
 		}
