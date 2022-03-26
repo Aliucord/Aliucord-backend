@@ -27,6 +27,10 @@ func init() {
 
 func initGithubLines() {
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
+		if msg.Author.Bot {
+			return
+		}
+
 		matches := githubLinesRegex.FindAllStringSubmatch(msg.Content, -1)
 		if len(matches) != 0 {
 			var sb strings.Builder

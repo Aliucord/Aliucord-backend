@@ -35,6 +35,10 @@ func InitCommands(botLogger *common.ExtendedLogger, botConfig *common.BotConfig,
 	initModCommands() // Requires config to be initialised, init() is called too early
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
+		if msg.Author.Bot {
+			return
+		}
+
 		prefix := prefixRegex.FindString(msg.Content)
 		if prefix == "" {
 			return
