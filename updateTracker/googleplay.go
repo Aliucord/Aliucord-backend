@@ -5,12 +5,13 @@ import (
 
 	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/Juby210/gplayapi-go"
+	"github.com/Juby210/gplayapi-go/gpproto"
 )
 
 type GooglePlayChecker struct {
 	client *gplayapi.GooglePlayClient
 
-	AccountConfig *common.GooglePlayChannelConfig
+	AccountConfig common.GooglePlayChannelConfig
 	Channel       string
 }
 
@@ -47,15 +48,12 @@ func (c *GooglePlayChecker) Check() (v int, app *gplayapi.App, err error) {
 	return
 }
 
-func (c *GooglePlayChecker) GetDownloadURL(version int) (url string, err error) {
+func (c *GooglePlayChecker) GetDownloadData(version int) (data *gpproto.AndroidAppDeliveryData, err error) {
 	err = c.init()
 	if err != nil {
 		return
 	}
-	data, err := c.client.Purchase(discordPkg, version)
-	if err == nil {
-		url = data.GetDownloadUrl()
-	}
+	data, err = c.client.Purchase(discordPkg, version)
 	return
 }
 
@@ -63,6 +61,6 @@ var gpCheckers = map[string]*GooglePlayChecker{}
 
 func initGPCheckers(cfg map[string]common.GooglePlayChannelConfig) {
 	for channel, accountConfig := range cfg {
-		gpCheckers[channel] = &GooglePlayChecker{AccountConfig: &accountConfig, Channel: channel}
+		gpCheckers[channel] = &GooglePlayChecker{AccountConfig: accountConfig, Channel: channel}
 	}
 }

@@ -78,7 +78,6 @@ type (
 
 		Cache             string
 		IgnoreFirstUpdate bool
-		DiscordJADX       *DiscordJADXConfig
 		Webhook           *UpdateWebhookConfig
 
 		GooglePlay map[string]GooglePlayChannelConfig
@@ -94,16 +93,7 @@ type (
 	GooglePlayChannelConfig struct {
 		Email    string
 		AASToken string
-		JADX     bool
 		Webhook  bool
-	}
-
-	DiscordJADXConfig struct {
-		ToggleableModule
-
-		AutoPush bool
-		WorkDir  string
-		RepoBase string
 	}
 
 	AutoReplyConfig struct {

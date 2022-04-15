@@ -49,12 +49,6 @@
     "enabled": true,
     "cache": "_cache.json",
     "ignoreFirstUpdate": true,
-    "discordJADX": {
-      "enabled": true,
-      "autoPush": true,
-      "workDir": "work",
-      "repoBase": "work/repo"
-    },
     "webhook": {
       "enabled": true,
       "id": 0,
@@ -64,7 +58,6 @@
       "alpha": {
         "email": "",
         "aasToken": "",
-        "jadx": true,
         "webhook": true
       }
     }
