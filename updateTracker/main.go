@@ -3,12 +3,12 @@ package updateTracker
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/discord"
+	"golang.org/x/exp/maps"
 )
 
 type DlCache struct {
@@ -26,8 +26,13 @@ const (
 
 var (
 	config  *common.Config
-	dlCache = map[int]*DlCache{}
-	wh      *webhook.Client
+	dlCache = map[string]map[int]*DlCache{
+		arm64: {},
+		arm32: {},
+		x64:   {},
+		x86:   {},
+	}
+	wh *webhook.Client
 
 	logger = common.NewLogger("[updateTracker]")
 )
@@ -90,8 +95,10 @@ func check(channel string) {
 	}
 	update := data.Version < gpVersion
 
-	if dl, ok := dlCache[data.Version]; ok && dl.Error != nil {
-		delete(dlCache, data.Version)
+	for _, cache := range dlCache {
+		if dl, ok := cache[data.Version]; ok && dl.Error != nil {
+			delete(cache, data.Version)
+		}
 	}
 
 	if wh == nil {
@@ -103,19 +110,26 @@ func check(channel string) {
 	}
 
 	if update {
-		dl, err := getDownloadData(gpVersion, true)
+		dl, err := getDownloadData(gpVersion, arm64, true)
 		if err == nil {
 			var description string
 			if len(dl.Splits) > 0 {
 				description += fmt.Sprintf("[base.apk](%s/download/discord?v=%d)", config.Origin, gpVersion)
-				for splitName := range dl.Splits {
-					description += fmt.Sprintf("\n[%s.apk](%s/download/discord?v=%d&split=%s)", splitName, config.Origin, gpVersion, splitName)
+				for _, splitName := range append(
+					maps.Keys(dl.Splits),
+					"config.hdpi",
+					"config."+string(arm32),
+					"config."+string(x64),
+					"config."+string(x86),
+				) {
+					description += fmt.Sprintf(
+						"\n[%s.apk](%s/download/discord?v=%d&split=%s)", splitName, config.Origin, gpVersion, splitName)
 				}
 			} else {
 				description = fmt.Sprintf("[Click here to download apk](%s/download/discord?v=%d)", config.Origin, gpVersion)
 			}
 			err = wh.Execute(webhook.ExecuteData{
-				Username: "Discord Update - " + strings.Title(channel),
+				Username: "Discord Update - " + common.ToTitle(channel),
 				Embeds: []discord.Embed{{
 					Author: &discord.EmbedAuthor{
 						Name: app.DisplayName,
@@ -139,8 +153,8 @@ func check(channel string) {
 	}
 }
 
-func getDownloadData(version int, bypass bool) (dl *DlCache, err error) {
-	dl, ok := dlCache[version]
+func getDownloadData(version int, arch string, bypass bool) (dl *DlCache, err error) {
+	dl, ok := dlCache[arch][version]
 	if ok && (!dl.GP || dl.Expiry > time.Now().Unix()) {
 		return dl, dl.Error
 	}
@@ -155,27 +169,26 @@ func getDownloadData(version int, bypass bool) (dl *DlCache, err error) {
 		}
 	}
 
-	data, err := gpCheckers["alpha"].GetDownloadData(version)
+	data, err := gpCheckers["alpha"].GetDownloadData(version, arch)
+	if dl == nil {
+		dl = &DlCache{GP: true}
+		dlCache[arch][version] = dl
+	}
+	dl.Expiry = time.Now().Unix() + 22*60*60
 	if err != nil {
-		dl = &DlCache{URL: "", GP: true, Expiry: time.Now().Unix() + 22*60*60, Error: err}
-		dlCache[version] = dl
+		dl.Error = err
 		return
 	}
 	if data.SplitDeliveryData == nil {
-		dl = &DlCache{URL: data.GetDownloadUrl(), GP: true, Expiry: time.Now().Unix() + 22*60*60}
+		dl.URL = data.GetDownloadUrl()
 	} else {
 		splits := map[string]string{}
 		for _, split := range data.SplitDeliveryData {
 			splits[split.GetName()] = split.GetDownloadUrl()
 		}
-		dl = &DlCache{
-			URL:    data.GetDownloadUrl(),
-			Splits: splits,
-			GP:     true,
-			Expiry: time.Now().Unix() + 22*60*60,
-		}
+		dl.URL = data.GetDownloadUrl()
+		dl.Splits = splits
 	}
-	dlCache[version] = dl
 	return
 }
 
@@ -191,7 +204,19 @@ func GetDownloadURL(version int, split string, bypass bool) (url string, err err
 		return url, nil
 	}
 
-	dl, err := getDownloadData(version, bypass)
+	var arch string
+	switch split {
+	case "config." + arm32, "config.hdpi":
+		arch = arm32
+	case "config." + x64:
+		arch = x64
+	case "config." + x86:
+		arch = x86
+	default:
+		arch = arm64
+	}
+
+	dl, err := getDownloadData(version, arch, bypass)
 	if err != nil {
 		return
 	}

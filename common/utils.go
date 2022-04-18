@@ -50,3 +50,7 @@ func IsAlpha(s string) bool {
 	}
 	return true
 }
+
+func ToTitle(s string) string {
+	return string(unicode.ToTitle(rune(s[0]))) + s[1:]
+}

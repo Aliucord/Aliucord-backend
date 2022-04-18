@@ -1,59 +1,78 @@
 package updateTracker
 
 import (
-	"strings"
-
 	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/Juby210/gplayapi-go"
 	"github.com/Juby210/gplayapi-go/gpproto"
 )
 
+const (
+	arm64 = "arm64_v8a"
+	arm32 = "armeabi_v7a"
+	x64   = "x86_64"
+	x86   = "x86"
+)
+
 type GooglePlayChecker struct {
-	client *gplayapi.GooglePlayClient
+	clients map[string]*gplayapi.GooglePlayClient
 
 	AccountConfig common.GooglePlayChannelConfig
 	Channel       string
 }
 
-func (c *GooglePlayChecker) init() (err error) {
-	if c.client == nil {
-		sFile := c.getSessionFile()
-		c.client, err = gplayapi.LoadSession(sFile)
+func (c *GooglePlayChecker) init(arch string) (err error) {
+	if c.clients[arch] == nil {
+		sFile := c.getSessionFile(arch)
+
+		var device *gplayapi.DeviceInfo
+		switch arch {
+		case arm32:
+			device = gplayapi.Redmi4
+		case x64:
+			device = gplayapi.Emulator_x86_64
+		case x86:
+			device = gplayapi.Emulator_x86
+		default:
+			device = gplayapi.Pixel3a
+		}
+
+		c.clients[arch], err = gplayapi.LoadSessionWithDeviceInfo(sFile, device)
 		if err != nil {
-			c.client, err = gplayapi.NewClient(c.AccountConfig.Email, c.AccountConfig.AASToken)
+			c.clients[arch], err = gplayapi.NewClientWithDeviceInfo(
+				c.AccountConfig.Email, c.AccountConfig.AASToken, device)
 			if err == nil {
-				c.client.SaveSession(sFile)
+				c.clients[arch].SaveSession(sFile)
 			}
 		}
-		if c.client != nil {
-			c.client.SessionFile = sFile
+		if c.clients[arch] != nil {
+			c.clients[arch].SessionFile = sFile
 		}
 	}
 	return
 }
 
-func (c *GooglePlayChecker) getSessionFile() string {
-	return "_session" + strings.Title(c.Channel) + ".json"
+func (c *GooglePlayChecker) getSessionFile(arch string) string {
+	return "_sessions/session" + common.ToTitle(c.Channel) + "." + arch + ".json"
 }
 
 func (c *GooglePlayChecker) Check() (v int, app *gplayapi.App, err error) {
-	err = c.init()
+	err = c.init(arm64)
 	if err != nil {
 		return
 	}
-	app, err = c.client.GetAppDetails(discordPkg)
+	app, err = c.clients[arm64].GetAppDetails(discordPkg)
 	if err == nil {
 		v = app.VersionCode
 	}
 	return
 }
 
-func (c *GooglePlayChecker) GetDownloadData(version int) (data *gpproto.AndroidAppDeliveryData, err error) {
-	err = c.init()
+func (c *GooglePlayChecker) GetDownloadData(version int, arch string) (data *gpproto.AndroidAppDeliveryData, err error) {
+	err = c.init(arch)
 	if err != nil {
 		return
 	}
-	data, err = c.client.Purchase(discordPkg, version)
+	data, err = c.clients[arch].Purchase(discordPkg, version)
 	return
 }
 
@@ -61,6 +80,10 @@ var gpCheckers = map[string]*GooglePlayChecker{}
 
 func initGPCheckers(cfg map[string]common.GooglePlayChannelConfig) {
 	for channel, accountConfig := range cfg {
-		gpCheckers[channel] = &GooglePlayChecker{AccountConfig: accountConfig, Channel: channel}
+		gpCheckers[channel] = &GooglePlayChecker{
+			clients:       map[string]*gplayapi.GooglePlayClient{},
+			AccountConfig: accountConfig,
+			Channel:       channel,
+		}
 	}
 }
