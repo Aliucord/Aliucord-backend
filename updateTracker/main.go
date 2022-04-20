@@ -3,12 +3,12 @@ package updateTracker
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/discord"
-	"golang.org/x/exp/maps"
 )
 
 type DlCache struct {
@@ -73,6 +73,9 @@ func Check() {
 
 func check(channel string) {
 	gpChecker := gpCheckers[channel]
+	if !gpChecker.AccountConfig.Webhook {
+		return
+	}
 
 	gpVersion, app, err := gpChecker.Check()
 	if err != nil {
@@ -115,16 +118,27 @@ func check(channel string) {
 			var description string
 			if len(dl.Splits) > 0 {
 				description += fmt.Sprintf("[base.apk](%s/download/discord?v=%d)", config.Origin, gpVersion)
-				for _, splitName := range append(
-					maps.Keys(dl.Splits),
-					"config.hdpi",
-					"config."+string(arm32),
-					"config."+string(x64),
-					"config."+string(x86),
-				) {
-					description += fmt.Sprintf(
-						"\n[%s.apk](%s/download/discord?v=%d&split=%s)", splitName, config.Origin, gpVersion, splitName)
+
+				var archSplits []string
+				var languageSplits []string
+				dpiSplits := []string{"config.hdpi"}
+
+				for splitName := range dl.Splits {
+					if splitName == "config."+arm64 {
+						archSplits = append(archSplits, splitName)
+					} else if strings.Contains(splitName, "dpi") {
+						dpiSplits = append(dpiSplits, splitName)
+					} else {
+						languageSplits = append(languageSplits, splitName)
+					}
 				}
+
+				archSplits = append(archSplits, "config."+arm32, "config."+x64, "config."+x86)
+
+				format := fmt.Sprintf("\n[%%s.apk](%s/download/discord?v=%d&split=%%s)", config.Origin, gpVersion)
+				description += joinSplits(archSplits, "Architecture", format)
+				description += joinSplits(dpiSplits, "DPI", format)
+				description += joinSplits(languageSplits, "Language", format)
 			} else {
 				description = fmt.Sprintf("[Click here to download apk](%s/download/discord?v=%d)", config.Origin, gpVersion)
 			}
@@ -151,6 +165,14 @@ func check(channel string) {
 		data.Version = gpVersion
 		logger.LogIfErr(cache.Persist())
 	}
+}
+
+func joinSplits(splits []string, title, format string) string {
+	ret := "\n\n**" + title + " splits**:"
+	for _, splitName := range splits {
+		ret += fmt.Sprintf(format, splitName, splitName)
+	}
+	return ret
 }
 
 func getDownloadData(version int, arch string, bypass bool) (dl *DlCache, err error) {
