@@ -8,18 +8,16 @@ import (
 	"time"
 
 	"github.com/Aliucord/Aliucord-backend/bot/modules"
+	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/Aliucord/Aliucord-backend/database"
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
 
-var (
-	mentionRegex  = regexp.MustCompile("<@!?\\d{17,19}>")
-	idRegex       = regexp.MustCompile("\\d{17,19}")
-	durationRegex = regexp.MustCompile("(\\d+)(s|seconds|secs?|m|mins?|minutes|h|hours|d|days|w|weeks)")
-)
+var durationRegex = regexp.MustCompile("(\\d+)(s|seconds|secs?|m|mins?|minutes|h|hours|d|days|w|weeks)")
 
 type nameAndID struct {
 	name string
@@ -27,15 +25,36 @@ type nameAndID struct {
 }
 
 func initModCommands() {
+	scamPhrasesOptions := []discord.CommandOptionValue{
+		&discord.StringOption{
+			OptionName:  "phrase",
+			Description: "Phrase",
+			Required:    true,
+		},
+	}
 	addCommand(&Command{
-		Name:             "scamphrases",
-		Aliases:          []string{"phrases"},
-		RequiredArgCount: 1,
-		Description:      "Add/Remove or list scam phrases",
-		Usage:            "<list | add | remove> [phrase]",
-		ModOnly:          true,
-		OwnerOnly:        false,
-		Callback:         scamPhrasesCommand,
+		CreateCommandData: api.CreateCommandData{
+			Name:        "scamphrases",
+			Description: "Add/Remove or list scam phrases",
+			Options: []discord.CommandOption{
+				&discord.SubcommandOption{
+					OptionName:  "list",
+					Description: "List scam phrases",
+				},
+				&discord.SubcommandOption{
+					OptionName:  "add",
+					Description: "Add scam phrase",
+					Options:     scamPhrasesOptions,
+				},
+				&discord.SubcommandOption{
+					OptionName:  "remove",
+					Description: "Remove scam phrase",
+					Options:     scamPhrasesOptions,
+				},
+			},
+		},
+		ModOnly: true,
+		Execute: scamPhrasesCommand,
 	})
 
 	roles := []nameAndID{
@@ -46,28 +65,50 @@ func initModCommands() {
 		{name: "reactionmute", id: config.RoleIDs.ReactionMuted},
 	}
 
+	muteOptions := []discord.CommandOption{
+		&discord.UserOption{
+			OptionName:  "user",
+			Description: "user to mute",
+		},
+		&discord.StringOption{
+			OptionName:  "users",
+			Description: "users to mute",
+		},
+		&discord.StringOption{
+			OptionName:  "duration",
+			Description: "mute duration",
+		},
+		&discord.StringOption{
+			OptionName:  "reason",
+			Description: "mute reason",
+		},
+	}
+	unmuteOptions := []discord.CommandOption{
+		&discord.UserOption{
+			OptionName:  "user",
+			Description: "user to unmute",
+		},
+	}
 	for _, role := range roles {
 		if role.id != 0 {
 			addCommand(&Command{
-				Name:             role.name,
-				Aliases:          []string{strings.Replace(role.name, "mute", "ban", -1)},
-				Description:      role.name + " one or more people",
-				Usage:            "<Member1 Member2 Member3...> [duration: 1w6h2m] [reason]",
-				RequiredArgCount: 1,
-				ModOnly:          true,
-				OwnerOnly:        false,
-				Callback:         makeMuteFunc(role.id),
+				CreateCommandData: api.CreateCommandData{
+					Name:        role.name,
+					Description: role.name + " one or more people",
+					Options:     muteOptions,
+				},
+				ModOnly: true,
+				Execute: makeMuteFunc(role.id),
 			})
 			unmuteName := strings.Replace(role.name, "mute", "unmute", -1)
 			addCommand(&Command{
-				Name:             unmuteName,
-				Aliases:          []string{strings.Replace(role.name, "mute", "unban", -1)},
-				Description:      unmuteName + " one or more people",
-				Usage:            "<Member1 Member2 Member3...>",
-				RequiredArgCount: 1,
-				ModOnly:          true,
-				OwnerOnly:        false,
-				Callback:         makeUnmuteFunc(role.id, role.name),
+				CreateCommandData: api.CreateCommandData{
+					Name:        unmuteName,
+					Description: unmuteName,
+					Options:     unmuteOptions,
+				},
+				ModOnly: true,
+				Execute: makeUnmuteFunc(role.id, role.name),
 			})
 		}
 	}
@@ -111,15 +152,17 @@ func initModCommands() {
 	}
 }
 
-func scamPhrasesCommand(ctx *CommandContext) (*discord.Message, error) {
-	switch strings.ToLower(ctx.Args[0]) {
+func scamPhrasesCommand(e *gateway.InteractionCreateEvent, d *discord.CommandInteraction) error {
+	cmd := d.Options[0]
+	subcommand := cmd.Name
+	switch subcommand {
 	case "list":
 		var phrases []database.ScamPhrase
 		err := database.DB.NewSelect().
 			Model(&phrases).
 			Scan(context.Background())
 		if err != nil {
-			return ctx.ReplyErr("listing scam phrases", err)
+			return replyErr(e, "listing scam phrases", err)
 		}
 
 		var sb strings.Builder
@@ -129,77 +172,65 @@ func scamPhrasesCommand(ctx *CommandContext) (*discord.Message, error) {
 		}
 
 		if sb.Len() == 0 {
-			return ctx.Reply("No banned phrases")
+			return ephemeralReply(e, "No banned phrases")
 		}
-		return ctx.Reply("Banned phrases: ```\n" + sb.String() + "```")
+		return ephemeralReply(e, "Banned phrases: ```\n"+sb.String()+"```")
 	case "add":
-		if len(ctx.Args) < 2 {
-			return ctx.Reply("Please specify a phrase")
-		}
-
 		res, err := database.DB.NewInsert().
 			Ignore(). // Ignore conflict
-			Model(&database.ScamPhrase{Phrase: strings.Join(ctx.Args[1:], " ")}).
+			Model(&database.ScamPhrase{Phrase: cmd.Options[0].String()}).
 			Exec(context.Background())
 		if err != nil {
-			return ctx.ReplyErr("adding scam phrase", err)
+			return replyErr(e, "adding scam phrase", err)
 		}
 
 		affected, _ := res.RowsAffected()
 		if affected == 0 {
-			return ctx.Reply("No rows affected. Phrase already added?")
+			return ephemeralReply(e, "No rows affected. Phrase already added?")
 		}
 
 		modules.UpdateScamTitles()
-		return ctx.Reply("Done!")
-	case "remove", "delete":
-		if len(ctx.Args) < 2 {
-			return ctx.Reply("Please specify a phrase")
-		}
-
+		return reply(e, "Added!")
+	case "remove":
 		res, err := database.DB.NewDelete().
 			Model((*database.ScamPhrase)(nil)).
-			Where("phrase = ?", strings.Join(ctx.Args[1:], " ")).
+			Where("phrase = ?", cmd.Options[0].String()).
 			Exec(context.Background())
 		if err != nil {
-			return ctx.ReplyErr("removing scam phrase", err)
+			return replyErr(e, "removing scam phrase", err)
 		}
 
 		affected, _ := res.RowsAffected()
 		if affected == 0 {
-			return ctx.Reply("No rows affected. Phrase not added?")
+			return ephemeralReply(e, "No rows affected. Phrase not added?")
 		}
 
 		modules.UpdateScamTitles()
-		return ctx.Reply("Done!")
-	default:
-		return ctx.Reply("No such subcommand: " + ctx.Args[0])
+		return reply(e, "Removed!")
 	}
+	return reply(e, "No such subcommand: "+subcommand)
 }
 
-func makeMuteFunc(roleID discord.RoleID) func(*CommandContext) (*discord.Message, error) {
-	return func(ctx *CommandContext) (*discord.Message, error) {
-		cleanedContent := mentionRegex.ReplaceAllString(strings.Join(ctx.Args, " "), "")
-		ids := idRegex.FindAllString(cleanedContent, -1)
-		cleanedContent = idRegex.ReplaceAllString(cleanedContent, "")
-
-		args := strings.Fields(cleanedContent)
-		durationStr := ""
-		if len(args) > 0 {
-			durationStr = args[0]
-		}
-		isDuration, duration := parseDuration(durationStr)
-		if isDuration {
-			args = args[1:]
+func makeMuteFunc(roleID discord.RoleID) func(*gateway.InteractionCreateEvent, *discord.CommandInteraction) error {
+	return func(e *gateway.InteractionCreateEvent, d *discord.CommandInteraction) error {
+		userIDs := getUserOrUsersOption(d)
+		if len(userIDs) == 0 {
+			return ephemeralReply(e, "Provide either `user` or `users` option.")
 		}
 
-		reason := ctx.Message.Author.Tag() + ": "
-		if len(args) > 0 {
-			reason += strings.Join(args, " ")
-		} else {
-			reason += "No reason specified."
+		durationOption := findOption(d, "duration")
+		hasDuration := durationOption != nil
+		var duration int64
+		var durationStr string
+		if hasDuration {
+			durationStr = durationOption.String()
+			hasDuration, duration = parseDuration(durationStr)
 		}
-		if isDuration {
+
+		reasonOption := findOption(d, "reason")
+		reason := e.Member.User.Tag() + ": " +
+			common.Ternary(reasonOption == nil, "No reason specified.", reasonOption.String())
+		if hasDuration {
 			reason += " (For " + durationStr + ")"
 		}
 
@@ -208,53 +239,37 @@ func makeMuteFunc(roleID discord.RoleID) func(*CommandContext) (*discord.Message
 		}
 
 		errorCount := 0
-		if ids != nil {
-			for _, idStr := range ids {
-				id, _ := strconv.ParseUint(idStr, 10, 64)
-				addMuteRole(ctx.Message.GuildID, discord.UserID(id), roleID, data, &errorCount, isDuration, duration)
-
-			}
-		}
-
-		for _, mention := range ctx.Message.Mentions {
-			if mention.ID != botUser.ID { // Might be command triggered with mention prefix xD
-				addMuteRole(ctx.Message.GuildID, mention.User.ID, roleID, data, &errorCount, isDuration, duration)
-			}
+		for _, id := range userIDs {
+			addMuteRole(e.GuildID, id, roleID, data, &errorCount, hasDuration, duration)
 		}
 
 		if errorCount == 0 {
-			return ctx.Reply("Done!")
+			return reply(e, "Muted!")
 		} else {
-			return ctx.Reply("I did not manage to give everyone the role. I failed on " + strconv.Itoa(errorCount) + " members :(")
+			return reply(e, "I did not manage to give everyone the role. I failed on "+strconv.Itoa(errorCount)+" members :(")
 		}
 	}
 }
 
-func makeUnmuteFunc(roleID discord.RoleID, muteName string) func(*CommandContext) (*discord.Message, error) {
-	return func(ctx *CommandContext) (*discord.Message, error) {
-		var userID discord.UserID
-		if len(ctx.Message.Mentions) > 0 {
-			userID = ctx.Message.Mentions[0].ID
-		} else {
-			match := idRegex.FindString(strings.Join(ctx.Args, " "))
-			if match == "" {
-				return ctx.Reply("Mention someone!")
-			}
-			id, _ := strconv.ParseUint(match, 10, 64)
-			userID = discord.UserID(id)
+func makeUnmuteFunc(roleID discord.RoleID, muteName string) func(*gateway.InteractionCreateEvent, *discord.CommandInteraction) error {
+	return func(e *gateway.InteractionCreateEvent, d *discord.CommandInteraction) error {
+		userIDs := maps.Keys(d.Resolved.Users)
+		if len(userIDs) != 1 {
+			return ephemeralReply(e, "Mention someone!")
 		}
 
-		member, err := s.Member(ctx.Message.GuildID, userID)
+		userID := userIDs[0]
+		member, err := s.Member(e.GuildID, userID)
 		if err != nil {
-			return ctx.Reply("I couldn't find that Member")
+			return ephemeralReply(e, "I couldn't find that member")
 		}
 		if !slices.Contains(member.RoleIDs, roleID) {
-			return ctx.Reply("That member isnt't " + muteName + "d")
+			return ephemeralReply(e, "That member isn't "+muteName+"d")
 		}
 
-		err = s.RemoveRole(ctx.Message.GuildID, userID, roleID, api.AuditLogReason("Unmuted by"+ctx.Message.Author.Tag()))
+		err = s.RemoveRole(e.GuildID, userID, roleID, api.AuditLogReason("Unmuted by"+e.Member.User.Tag()))
 		if err != nil {
-			return ctx.Reply("Failed to unmute that member")
+			return ephemeralReply(e, "Failed to unmute that member")
 		}
 
 		_, err = database.DB.NewDelete().
@@ -264,7 +279,7 @@ func makeUnmuteFunc(roleID discord.RoleID, muteName string) func(*CommandContext
 			Exec(context.Background())
 		logger.LogIfErr(err)
 
-		return ctx.Reply("Done!")
+		return reply(e, "Unmuted!")
 	}
 }
 
@@ -296,20 +311,28 @@ func parseDuration(text string) (bool, int64) {
 	return true, seconds
 }
 
-func addMuteRole(gid discord.GuildID, uid discord.UserID, rid discord.RoleID, data api.AddRoleData, errorCount *int, isDuration bool, duration int64) {
-	if err := s.AddRole(gid, uid, rid, data); err != nil {
+func addMuteRole(
+	gID discord.GuildID,
+	uID discord.UserID,
+	rID discord.RoleID,
+	data api.AddRoleData,
+	errorCount *int,
+	hasDuration bool,
+	duration int64,
+) {
+	if err := s.AddRole(gID, uID, rID, data); err != nil {
 		*errorCount++
 		logger.Println(err)
 	} else {
 		var endDate int64 = -1
-		if isDuration {
+		if hasDuration {
 			endDate = time.Now().Unix() + duration
 		}
 
 		mute := database.Mute{
-			UserID:  uid,
-			RoleID:  rid,
-			GuildID: gid,
+			UserID:  uID,
+			RoleID:  rID,
+			GuildID: gID,
 			EndDate: endDate,
 			Reason:  string(data.AuditLogReason),
 		}
@@ -328,7 +351,7 @@ func addMuteRole(gid discord.GuildID, uid discord.UserID, rid discord.RoleID, da
 			logger.LogIfErr(err)
 		}
 
-		if isDuration {
+		if hasDuration {
 			startUnmuteTimer(mute)
 		}
 	}
