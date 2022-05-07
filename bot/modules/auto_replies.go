@@ -98,7 +98,7 @@ func initAutoReplies() {
 		}
 
 		for _, role := range msg.Member.RoleIDs {
-			if slices.Contains(cfg.IgnoredRoles, role) {
+			if slices.Contains(config.RoleIDs.IgnoredRoles, role) {
 				return
 			}
 		}

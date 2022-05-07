@@ -38,7 +38,10 @@
       "newPlugins": 0,
       "supportCategory": 0
     },
-    "antiZip": true
+    "antiZip": {
+      "enabled": true,
+      "targetChannels": [0]
+    }
   },
   "database": {
     "addr": "127.0.0.1:5432",

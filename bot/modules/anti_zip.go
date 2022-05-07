@@ -3,8 +3,8 @@ package modules
 import (
 	"strings"
 
-	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"golang.org/x/exp/slices"
 )
 
 func init() {
@@ -14,7 +14,7 @@ func init() {
 var blacklistedExts = []string{"zip", "exe", "dll", "jar"}
 
 func initAntiZip() {
-	if !config.AntiZip {
+	if !config.AntiZip.Enabled {
 		return
 	}
 
@@ -23,8 +23,12 @@ func initAntiZip() {
 			return
 		}
 
+		if !slices.Contains(config.AntiZip.TargetChannels, msg.ChannelID) {
+			return
+		}
+
 		for _, role := range msg.Member.RoleIDs {
-			if common.HasRole(config.RoleIDs.IgnoredRoles, role) {
+			if slices.Contains(config.RoleIDs.IgnoredRoles, role) {
 				return
 			}
 		}
@@ -32,7 +36,7 @@ func initAntiZip() {
 		for _, attachment := range msg.Attachments {
 			for _, ext := range blacklistedExts {
 				if strings.HasSuffix(attachment.Filename, ext) {
-					err := s.DeleteMessage(msg.ChannelID, msg.ID, "Sent unallowed attachment")
+					err := s.DeleteMessage(msg.ChannelID, msg.ID, "Sent disallowed attachment type")
 					if err != nil {
 						logger.Println(err)
 					}

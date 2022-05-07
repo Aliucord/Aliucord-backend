@@ -34,7 +34,7 @@ type (
 		AntiNitroScam       bool
 		NormalizeNicknames  bool
 		AutoReplyConfig     *AutoReplyConfig
-		AntiZip             bool
+		AntiZip             *AntiZipConfig
 	}
 
 	RoleIDsConfig struct {
@@ -106,5 +106,11 @@ type (
 		NewPlugins  discord.ChannelID
 
 		SupportCategory discord.ChannelID
+	}
+
+	AntiZipConfig struct {
+		ToggleableModule
+
+		TargetChannels []discord.ChannelID
 	}
 )
