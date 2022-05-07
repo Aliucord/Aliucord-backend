@@ -11,7 +11,7 @@ func init() {
 	modules = append(modules, initAntiZip)
 }
 
-var blacklistedExts = []string{"zip", "exe", "dll", "jar"}
+var blacklistedExts = []string{"zip", "exe", "dll", "jar", "deb", "msi", "tar", "gz", "gzip", "bz2", "xz", "apk", "apks", "xapk", "cab", "iso", "img", "rpm", "dmg", "com", "bat", "sh", "zst"}
 
 func initAntiZip() {
 	if !config.AntiZip.Enabled {
