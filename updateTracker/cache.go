@@ -15,7 +15,6 @@ type (
 
 	CacheData struct {
 		Version int
-		JADX    bool
 	}
 )
 

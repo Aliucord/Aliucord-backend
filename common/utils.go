@@ -3,8 +3,7 @@ package common
 import (
 	"log"
 	"os"
-
-	"github.com/diamondburned/arikawa/v3/discord"
+	"unicode"
 )
 
 type ExtendedLogger struct {
@@ -21,28 +20,37 @@ func (logger *ExtendedLogger) LogIfErr(err error) {
 	}
 }
 
+// LogWithCtxIfErr logs one or more errors with context.
+// Context should be simple description with -ing verb like
+// "adding role" (will be logged as "Exception while adding role")
+func (logger *ExtendedLogger) LogWithCtxIfErr(context string, errs ...error) {
+	hasLogged := false
+	for _, err := range errs {
+		if err != nil {
+			if !hasLogged {
+				logger.Println("Exception while " + context)
+				hasLogged = true
+			}
+			logger.Println("\t", err)
+		}
+	}
+}
+
 func (logger *ExtendedLogger) PanicIfErr(err error) {
 	if err != nil {
 		logger.Panic(err)
 	}
 }
 
-// please go add generics faster
-
-func HasRole(roles []discord.RoleID, role discord.RoleID) bool {
-	for _, id := range roles {
-		if id == role {
-			return true
+func IsAlpha(s string) bool {
+	for _, r := range s {
+		if !unicode.IsLetter(r) {
+			return false
 		}
 	}
-	return false
+	return true
 }
 
-func HasUser(users []discord.UserID, user discord.UserID) bool {
-	for _, id := range users {
-		if id == user {
-			return true
-		}
-	}
-	return false
+func ToTitle(s string) string {
+	return string(unicode.ToTitle(rune(s[0]))) + s[1:]
 }

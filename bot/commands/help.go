@@ -32,21 +32,24 @@ func helpCommand(ctx *CommandContext) (*discord.Message, error) {
 			return ctx.Reply("No such command: " + ctx.Args[0])
 		}
 
+		fields := []discord.EmbedField{
+			{
+				Name:   "Usage",
+				Value:  "```\n" + ctx.Prefix + cmd.Name + " " + cmd.Usage + "```",
+				Inline: false,
+			},
+		}
+		if len(cmd.Aliases) > 0 {
+			fields = append(fields, discord.EmbedField{
+				Name:   "Aliases",
+				Value:  strings.Join(cmd.Aliases, ", "),
+				Inline: false,
+			})
+		}
 		embed := discord.Embed{
 			Title:       ctx.Prefix + cmd.Name,
 			Description: "OwnerOnly: " + getEmoji(cmd.OwnerOnly) + "\nModOnly: " + getEmoji(cmd.ModOnly) + "\nRequired Args: " + strconv.Itoa(cmd.RequiredArgCount) + "\n\n" + cmd.Description,
-			Fields: []discord.EmbedField{
-				{
-					Name:   "Aliases",
-					Value:  strings.Join(cmd.Aliases, ", "),
-					Inline: false,
-				},
-				{
-					Name:   "Usage",
-					Value:  "```\n" + ctx.Prefix + cmd.Name + " " + cmd.Usage + "```",
-					Inline: false,
-				},
-			},
+			Fields:      fields,
 		}
 		return ctx.ReplyEmbed("", embed)
 	}

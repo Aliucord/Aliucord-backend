@@ -3,7 +3,8 @@
 work
 backend*
 Aliucord-backend*
-_*.json
+_cache.json
+_sessions/
 config.json
 config.prod.json
 go.sum

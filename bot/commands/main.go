@@ -11,6 +11,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"golang.org/x/exp/slices"
 )
 
 var (
@@ -34,11 +35,17 @@ func InitCommands(botLogger *common.ExtendedLogger, botConfig *common.BotConfig,
 	initModCommands() // Requires config to be initialised, init() is called too early
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
+		if msg.Author.Bot {
+			return
+		}
+
 		prefix := prefixRegex.FindString(msg.Content)
 		if prefix == "" {
 			return
 		}
-		args := strings.Fields(msg.Content[len(prefix):])
+		args := strings.FieldsFunc(msg.Content[len(prefix):], func(r rune) bool {
+			return r == ' '
+		})
 		if len(args) == 0 {
 			return
 		}
@@ -47,13 +54,9 @@ func InitCommands(botLogger *common.ExtendedLogger, botConfig *common.BotConfig,
 		if command == nil {
 			return
 		}
-		if !common.HasUser(config.OwnerIDs, msg.Author.ID) {
-			if command.OwnerOnly {
-				return
-			}
-			if command.ModOnly && !common.HasRole(msg.Member.RoleIDs, config.RoleIDs.ModRole) {
-				return
-			}
+		if !slices.Contains(config.OwnerIDs, msg.Author.ID) &&
+			(command.OwnerOnly || command.ModOnly && !slices.Contains(msg.Member.RoleIDs, config.RoleIDs.ModRole)) {
+			return
 		}
 
 		ctx := CommandContext{
@@ -108,6 +111,12 @@ func (ctx *CommandContext) ReplyNoMentions(content string) (*discord.Message, er
 		Reference:       &discord.MessageReference{MessageID: ctx.Message.ID},
 		AllowedMentions: &api.AllowedMentions{RepliedUser: option.False},
 	})
+}
+
+func (ctx *CommandContext) ReplyErr(context string, err error) (*discord.Message, error) {
+	logger.Println("Err while " + context)
+	logger.Println(err)
+	return ctx.Reply("Something went wrong: ```\n" + err.Error() + "```")
 }
 
 func addCommand(cmd *Command) {

@@ -3,19 +3,17 @@ package updateTracker
 import (
 	"errors"
 	"fmt"
-	"os"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Aliucord/Aliucord-backend/common"
-	"github.com/Juby210/admh/aptoide"
 	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/discord"
 )
 
 type DlCache struct {
 	URL    string
+	Splits map[string]string
 	GP     bool
 	Expiry int64
 	Error  error
@@ -28,8 +26,13 @@ const (
 
 var (
 	config  *common.Config
-	dlCache = map[int]DlCache{}
-	wh      *webhook.Client
+	dlCache = map[string]map[int]*DlCache{
+		arm64: {},
+		arm32: {},
+		x64:   {},
+		x86:   {},
+	}
+	wh *webhook.Client
 
 	logger = common.NewLogger("[updateTracker]")
 )
@@ -63,13 +66,16 @@ func StartUpdateTracker(cfg *common.Config) {
 func Check() {
 	logger.Println("Checking for discord updates")
 
-	for channel, cfg := range config.UpdateTracker.GooglePlay {
-		check(channel, cfg)
+	for channel := range config.UpdateTracker.GooglePlay {
+		check(channel)
 	}
 }
 
-func check(channel string, cfg common.GooglePlayChannelConfig) {
+func check(channel string) {
 	gpChecker := gpCheckers[channel]
+	if !gpChecker.AccountConfig.Webhook {
+		return
+	}
 
 	gpVersion, app, err := gpChecker.Check()
 	if err != nil {
@@ -87,105 +93,164 @@ func check(channel string, cfg common.GooglePlayChannelConfig) {
 
 	if config.UpdateTracker.IgnoreFirstUpdate && data.Version == 0 {
 		data.Version = gpVersion
-		data.JADX = true
 		logger.LogIfErr(cache.Persist())
 		return
 	}
 	update := data.Version < gpVersion
 
-	if config.UpdateTracker.DiscordJADX.Enabled && cfg.JADX {
-		if update || !data.JADX {
-			err = Extract(channel, app)
-			logger.LogIfErr(err)
-			if err == nil {
-				data.Version = gpVersion
-				data.JADX = true
-				logger.LogIfErr(cache.Persist())
-			}
+	for _, cache := range dlCache {
+		if dl, ok := cache[data.Version]; ok && dl.Error != nil {
+			delete(cache, data.Version)
 		}
-	}
-
-	if dl, ok := dlCache[data.Version]; ok && dl.Error != nil {
-		delete(dlCache, data.Version)
 	}
 
 	if wh == nil {
 		if data.Version < gpVersion {
 			data.Version = gpVersion
-			data.JADX = false
 			logger.LogIfErr(cache.Persist())
 		}
 		return
 	}
 
 	if update {
-		err = wh.Execute(webhook.ExecuteData{
-			Username: "Discord Update - " + strings.Title(channel),
-			Embeds: []discord.Embed{{
-				Author: &discord.EmbedAuthor{
-					Name: app.DisplayName,
-					Icon: app.IconImage.GetImageUrl(),
-					URL:  googlePlayURL,
-				},
-				Title:       fmt.Sprintf("New version: **%s (%d)**", app.VersionName, gpVersion),
-				Description: fmt.Sprintf("[Click here to download apk](%s/download/discord?v=%d)", config.Origin, gpVersion),
-				Color:       7506394,
-			}},
-		})
-		logger.LogIfErr(err)
+		dl, err := getDownloadData(gpVersion, arm64, true)
+		if err == nil {
+			var description string
+			if len(dl.Splits) > 0 {
+				description += fmt.Sprintf("[base.apk](%s/download/discord?v=%d)", config.Origin, gpVersion)
+
+				var archSplits []string
+				var languageSplits []string
+				dpiSplits := []string{"config.hdpi"}
+
+				for splitName := range dl.Splits {
+					if splitName == "config."+arm64 {
+						archSplits = append(archSplits, splitName)
+					} else if strings.Contains(splitName, "dpi") {
+						dpiSplits = append(dpiSplits, splitName)
+					} else {
+						languageSplits = append(languageSplits, splitName)
+					}
+				}
+
+				archSplits = append(archSplits, "config."+arm32, "config."+x64, "config."+x86)
+
+				format := fmt.Sprintf("\n[%%s.apk](%s/download/discord?v=%d&split=%%s)", config.Origin, gpVersion)
+				description += joinSplits(archSplits, "Architecture", format)
+				description += joinSplits(dpiSplits, "DPI", format)
+				description += joinSplits(languageSplits, "Language", format)
+			} else {
+				description = fmt.Sprintf("[Click here to download apk](%s/download/discord?v=%d)", config.Origin, gpVersion)
+			}
+			err = wh.Execute(webhook.ExecuteData{
+				Username: "Discord Update - " + common.ToTitle(channel),
+				Embeds: []discord.Embed{{
+					Author: &discord.EmbedAuthor{
+						Name: app.DisplayName,
+						Icon: app.IconImage.GetImageUrl(),
+						URL:  googlePlayURL,
+					},
+					Title:       fmt.Sprintf("New version: **%s (%d)**", app.VersionName, gpVersion),
+					Description: description,
+					Color:       7506394,
+				}},
+			})
+			logger.LogIfErr(err)
+		} else {
+			logger.Println(err)
+		}
 	}
 
 	if data.Version < gpVersion {
 		data.Version = gpVersion
-		data.JADX = false
 		logger.LogIfErr(cache.Persist())
 	}
 }
 
-func GetDownloadURL(version int, bypass bool) (url string, err error) {
+func joinSplits(splits []string, title, format string) string {
+	ret := "\n\n**" + title + " splits**:"
+	for _, splitName := range splits {
+		ret += fmt.Sprintf(format, splitName, splitName)
+	}
+	return ret
+}
+
+func getDownloadData(version int, arch string, bypass bool) (dl *DlCache, err error) {
+	dl, ok := dlCache[arch][version]
+	if ok && (!dl.GP || dl.Expiry > time.Now().Unix()) {
+		return dl, dl.Error
+	}
+
 	if !bypass {
-		apkName := "com.discord-" + strconv.Itoa(version) + ".apk"
-		if _, err = os.Stat(config.UpdateTracker.DiscordJADX.WorkDir + "/apk/" + apkName); err == nil {
-			return config.Origin + "/download/direct/" + apkName, nil
+		if version < config.MinDownloadVer || config.MaxDownloadVer != 0 && config.MaxDownloadVer < version {
+			return nil, errors.New("you are trying to request too old or new version")
+		}
+		// gets release channel from version code, max release channel is 2 so all versions with higher type are invalid
+		if version/100%10 > 2 {
+			return nil, errors.New("invalid version code")
 		}
 	}
+
+	data, err := gpCheckers["alpha"].GetDownloadData(version, arch)
+	if dl == nil {
+		dl = &DlCache{GP: true}
+		dlCache[arch][version] = dl
+	}
+	dl.Expiry = time.Now().Unix() + 22*60*60
+	if err != nil {
+		dl.Error = err
+		return
+	}
+	if data.SplitDeliveryData == nil {
+		dl.URL = data.GetDownloadUrl()
+	} else {
+		splits := map[string]string{}
+		for _, split := range data.SplitDeliveryData {
+			splits[split.GetName()] = split.GetDownloadUrl()
+		}
+		dl.URL = data.GetDownloadUrl()
+		dl.Splits = splits
+	}
+	return
+}
+
+func GetDownloadURL(version int, split string, bypass bool) (url string, err error) {
+	// if !bypass {
+	// 	apkName := "com.discord-" + strconv.Itoa(version) + ".apk"
+	// 	if _, err = os.Stat(config.UpdateTracker.DiscordJADX.WorkDir + "/apk/" + apkName); err == nil {
+	// 		return config.Origin + "/download/direct/" + apkName, nil
+	// 	}
+	// }
 
 	if url, ok := config.Mirrors[version]; ok {
 		return url, nil
 	}
 
-	dl, ok := dlCache[version]
-	if ok && (!dl.GP || dl.Expiry > time.Now().Unix()) {
-		return dl.URL, dl.Error
+	var arch string
+	switch split {
+	case "config." + arm32, "config.hdpi":
+		arch = arm32
+	case "config." + x64:
+		arch = x64
+	case "config." + x86:
+		arch = x86
+	default:
+		arch = arm64
 	}
 
-	if !bypass {
-		if version < config.MinDownloadVer || config.MaxDownloadVer != 0 && config.MaxDownloadVer < version {
-			return "", errors.New("you are trying to request too old or new version")
+	dl, err := getDownloadData(version, arch, bypass)
+	if err != nil {
+		return
+	}
+	if split != "" {
+		if splitUrl, ok := dl.Splits[split]; ok {
+			url = splitUrl
+		} else {
+			err = errors.New("split not found")
 		}
-		// gets release channel from version code, max release channel is 2 so all versions with higher type are invalid
-		if version/100%10 > 2 {
-			return "", errors.New("invalid version code")
-		}
+	} else {
+		url = dl.URL
 	}
 
-	useAptoide := true
-	for _, v := range config.DisableAptoide {
-		if v == version {
-			useAptoide = false
-			break
-		}
-	}
-
-	if useAptoide {
-		url, err = aptoide.DownloadUrlResolver(discordPkg, version)
-		if err == nil {
-			dlCache[version] = DlCache{URL: url}
-			return
-		}
-	}
-
-	url, err = gpCheckers["alpha"].GetDownloadURL(version)
-	dlCache[version] = DlCache{URL: url, GP: true, Expiry: time.Now().Unix() + 22*60*60, Error: err}
 	return
 }

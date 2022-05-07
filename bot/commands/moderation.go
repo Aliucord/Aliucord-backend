@@ -7,11 +7,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Aliucord/Aliucord-backend/common"
+	"github.com/Aliucord/Aliucord-backend/bot/modules"
 	"github.com/Aliucord/Aliucord-backend/database"
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"golang.org/x/exp/slices"
 )
 
 var (
@@ -26,6 +27,17 @@ type nameAndID struct {
 }
 
 func initModCommands() {
+	addCommand(&Command{
+		Name:             "scamphrases",
+		Aliases:          []string{"phrases"},
+		RequiredArgCount: 1,
+		Description:      "Add/Remove or list scam phrases",
+		Usage:            "<list | add | remove> [phrase]",
+		ModOnly:          true,
+		OwnerOnly:        false,
+		Callback:         scamPhrasesCommand,
+	})
+
 	roles := []nameAndID{
 		{name: "supportmute", id: config.RoleIDs.SupportMuted},
 		{name: "devmute", id: config.RoleIDs.DevMuted},
@@ -96,6 +108,72 @@ func initModCommands() {
 		for _, mute := range mutes {
 			startUnmuteTimer(mute)
 		}
+	}
+}
+
+func scamPhrasesCommand(ctx *CommandContext) (*discord.Message, error) {
+	switch strings.ToLower(ctx.Args[0]) {
+	case "list":
+		var phrases []database.ScamPhrase
+		err := database.DB.NewSelect().
+			Model(&phrases).
+			Scan(context.Background())
+		if err != nil {
+			return ctx.ReplyErr("listing scam phrases", err)
+		}
+
+		var sb strings.Builder
+		for _, phrase := range phrases {
+			sb.WriteString(phrase.Phrase)
+			sb.WriteRune('\n')
+		}
+
+		if sb.Len() == 0 {
+			return ctx.Reply("No banned phrases")
+		}
+		return ctx.Reply("Banned phrases: ```\n" + sb.String() + "```")
+	case "add":
+		if len(ctx.Args) < 2 {
+			return ctx.Reply("Please specify a phrase")
+		}
+
+		res, err := database.DB.NewInsert().
+			Ignore(). // Ignore conflict
+			Model(&database.ScamPhrase{Phrase: strings.Join(ctx.Args[1:], " ")}).
+			Exec(context.Background())
+		if err != nil {
+			return ctx.ReplyErr("adding scam phrase", err)
+		}
+
+		affected, _ := res.RowsAffected()
+		if affected == 0 {
+			return ctx.Reply("No rows affected. Phrase already added?")
+		}
+
+		modules.UpdateScamTitles()
+		return ctx.Reply("Done!")
+	case "remove", "delete":
+		if len(ctx.Args) < 2 {
+			return ctx.Reply("Please specify a phrase")
+		}
+
+		res, err := database.DB.NewDelete().
+			Model((*database.ScamPhrase)(nil)).
+			Where("phrase = ?", strings.Join(ctx.Args[1:], " ")).
+			Exec(context.Background())
+		if err != nil {
+			return ctx.ReplyErr("removing scam phrase", err)
+		}
+
+		affected, _ := res.RowsAffected()
+		if affected == 0 {
+			return ctx.Reply("No rows affected. Phrase not added?")
+		}
+
+		modules.UpdateScamTitles()
+		return ctx.Reply("Done!")
+	default:
+		return ctx.Reply("No such subcommand: " + ctx.Args[0])
 	}
 }
 
@@ -170,7 +248,7 @@ func makeUnmuteFunc(roleID discord.RoleID, muteName string) func(*CommandContext
 		if err != nil {
 			return ctx.Reply("I couldn't find that Member")
 		}
-		if !common.HasRole(member.RoleIDs, roleID) {
+		if !slices.Contains(member.RoleIDs, roleID) {
 			return ctx.Reply("That member isnt't " + muteName + "d")
 		}
 
@@ -271,7 +349,7 @@ func startUnmuteTimer(mute database.Mute) {
 }
 
 func unmute(mute database.Mute, reason api.AuditLogReason) error {
-	if member, err := s.Member(mute.GuildID, mute.UserID); err == nil && common.HasRole(member.RoleIDs, mute.RoleID) {
+	if member, err := s.Member(mute.GuildID, mute.UserID); err == nil && slices.Contains(member.RoleIDs, mute.RoleID) {
 		if err = s.RemoveRole(mute.GuildID, mute.UserID, mute.RoleID, reason); err != nil {
 			return err
 		}
