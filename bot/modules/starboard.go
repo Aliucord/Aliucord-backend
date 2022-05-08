@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
@@ -38,9 +39,11 @@ func initStarboard() {
 	}
 
 	s.AddHandler(func(e *gateway.MessageReactionAddEvent) {
-		starboardMutex.Lock()
-		processReaction(e.ChannelID, e.MessageID, e.Emoji, e.UserID)
-		starboardMutex.Unlock()
+		if e.MessageID.Time().Unix() > time.Now().Unix()-30*24*60*60 {
+			starboardMutex.Lock()
+			processReaction(e.ChannelID, e.MessageID, e.Emoji, e.UserID)
+			starboardMutex.Unlock()
+		}
 	})
 	s.AddHandler(func(e *gateway.MessageReactionRemoveEvent) {
 		starboardMutex.Lock()
