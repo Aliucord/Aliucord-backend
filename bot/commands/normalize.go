@@ -28,6 +28,14 @@ func init() {
 		ModOnly: true,
 		Execute: normalizeCommand,
 	})
+	addCommand(&Command{
+		CreateCommandData: api.CreateCommandData{
+			Name: "Normalize",
+			Type: discord.UserCommand,
+		},
+		ModOnly: true,
+		Execute: normalizeCommand,
+	})
 }
 
 func normalizeCommand(e *gateway.InteractionCreateEvent, d *discord.CommandInteraction) error {

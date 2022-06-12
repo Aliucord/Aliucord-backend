@@ -34,15 +34,32 @@ func init() {
 			},
 		},
 		OwnerOnly: true,
-		Execute:   evalCommand,
+		Execute: func(ev *gateway.InteractionCreateEvent, d *discord.CommandInteraction) error {
+			return eval(ev, d, findOption(d, "code").String(), boolOrDefault(d, "send", true))
+		},
+	})
+	addCommand(&Command{
+		CreateCommandData: api.CreateCommandData{
+			Name: "Eval",
+			Type: discord.MessageCommand,
+		},
+		OwnerOnly: true,
+		Execute: func(ev *gateway.InteractionCreateEvent, d *discord.CommandInteraction) error {
+			var msg *discord.Message
+			for _, m := range d.Resolved.Messages {
+				msg = &m
+				break
+			}
+
+			if msg == nil {
+				return ephemeralReply(ev, "No message provided")
+			}
+			return eval(ev, d, msg.Content, true)
+		},
 	})
 }
 
-// it works pretty bad with slash commands tbh, maybe add minimal command handler for normal messages?
-func evalCommand(ev *gateway.InteractionCreateEvent, d *discord.CommandInteraction) error {
-	code := findOption(d, "code").String()
-	send := boolOrDefault(d, "send", true)
-
+func eval(ev *gateway.InteractionCreateEvent, d *discord.CommandInteraction, code string, send bool) error {
 	if strings.HasPrefix(code, "```") {
 		code = code[3 : len(code)-3]
 		if strings.HasPrefix(code, "go\n") {
