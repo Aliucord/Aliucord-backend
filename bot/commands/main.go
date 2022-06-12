@@ -3,7 +3,6 @@ package commands
 import (
 	"regexp"
 	"strconv"
-	"strings"
 
 	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/diamondburned/arikawa/v3/api"
@@ -11,6 +10,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
 
@@ -20,109 +20,131 @@ var (
 	logger        *common.ExtendedLogger
 	commandsMap   = make(map[string]*Command)
 	commandsCount = 0
-	prefixRegex   *regexp.Regexp
-	botUser       *discord.User
+
+	idRegex = regexp.MustCompile("\\d{17,19}")
 )
 
-func InitCommands(botLogger *common.ExtendedLogger, botConfig *common.BotConfig, state *state.State, me *discord.User) {
+func InitCommands(botLogger *common.ExtendedLogger, botConfig *common.BotConfig, state *state.State) {
 	s = state
 	logger = botLogger
 	config = botConfig
-	botUser = me
-
-	prefixRegex = regexp.MustCompile("^(<@!?" + me.ID.String() + ">|" + regexp.QuoteMeta(config.CommandsPrefix) + ")\\s*")
 
 	initModCommands() // Requires config to be initialised, init() is called too early
 
-	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
-		if msg.Author.Bot {
-			return
-		}
+	logger.Printf("Loaded %d commands\n", commandsCount)
 
-		prefix := prefixRegex.FindString(msg.Content)
-		if prefix == "" {
-			return
-		}
-		args := strings.FieldsFunc(msg.Content[len(prefix):], func(r rune) bool {
-			return r == ' '
-		})
-		if len(args) == 0 {
-			return
-		}
+	ready := s.Ready()
+	commands := common.MapTransform(commandsMap, func(_ string, command *Command) api.CreateCommandData {
+		return command.CreateCommandData
+	})
+	for _, guild := range ready.Guilds {
+		guildID := guild.ID
 
-		command := commandsMap[strings.ToLower(args[0])]
-		if command == nil {
-			return
+		_, err := s.BulkOverwriteGuildCommands(ready.Application.ID, guildID, commands)
+		if err == nil {
+			logger.Printf("Registered commands in %d guild\n", guildID)
+		} else {
+			logger.Printf("Failed to register commands in %d guild (%v)\n", guildID, err)
 		}
-		if !slices.Contains(config.OwnerIDs, msg.Author.ID) &&
-			(command.OwnerOnly || command.ModOnly && !slices.Contains(msg.Member.RoleIDs, config.RoleIDs.ModRole)) {
-			return
-		}
+	}
 
-		ctx := CommandContext{
-			Message: msg,
-			Args:    args[1:],
-			Prefix:  prefix,
-		}
-		if command.RequiredArgCount > len(ctx.Args) {
-			_, _ = ctx.Reply("Too few arguments. Expected " + strconv.Itoa(command.RequiredArgCount) + ", got " + strconv.Itoa(len(ctx.Args)))
-			return
-		}
+	s.AddHandler(func(e *gateway.InteractionCreateEvent) {
+		switch d := e.Data.(type) {
+		case *discord.CommandInteraction:
+			command, ok := commandsMap[d.Name]
+			if !ok || command == nil {
+				return
+			}
 
-		_, err := command.Callback(&ctx)
-		if err != nil {
-			_, _ = ctx.Reply("Something went wrong, sorry :(")
-			logger.Printf("Error while running command %s with args %s", command.Name, strings.Join(args, ","))
-			logger.Println(err)
+			// extra checks if discord does something dumb
+			if !slices.Contains(config.OwnerIDs, e.Member.User.ID) &&
+				(command.OwnerOnly || command.ModOnly && !slices.Contains(e.Member.RoleIDs, config.RoleIDs.ModRole)) {
+				return
+			}
+
+			if err := command.Execute(e, d); err != nil {
+				logger.LogIfErr(s.RespondInteraction(e.ID, e.Token, api.InteractionResponse{
+					Type: api.MessageInteractionWithSource,
+					Data: &api.InteractionResponseData{
+						Content: option.NewNullableString("Something went wrong, sorry :("),
+						Flags:   api.EphemeralResponse,
+					},
+				}))
+				logger.Printf("Error while running command %s\n%v\n", command.Name, err)
+			}
 		}
 	})
-
-	logger.Printf("Loaded %d commands\n", commandsCount)
 }
 
 type Command struct {
-	Name             string
-	Aliases          []string
-	RequiredArgCount int
-	Description      string
-	Usage            string
-	ModOnly          bool
-	OwnerOnly        bool
-	Callback         func(*CommandContext) (*discord.Message, error)
+	api.CreateCommandData
+
+	ModOnly   bool
+	OwnerOnly bool
+	Execute   func(e *gateway.InteractionCreateEvent, d *discord.CommandInteraction) error
 }
 
-type CommandContext struct {
-	Message *gateway.MessageCreateEvent
-	Args    []string
-	Prefix  string
-}
+func getMultipleUsersOption(d *discord.CommandInteraction) []discord.UserID {
+	usersOption := findOption(d, "users")
+	if usersOption == nil {
+		return []discord.UserID{}
+	}
 
-func (ctx *CommandContext) Reply(content string) (*discord.Message, error) {
-	return s.SendTextReply(ctx.Message.ChannelID, content, ctx.Message.ID)
-}
-
-func (ctx *CommandContext) ReplyEmbed(content string, embeds ...discord.Embed) (*discord.Message, error) {
-	return s.SendMessageReply(ctx.Message.ChannelID, content, ctx.Message.ID, embeds...)
-}
-
-func (ctx *CommandContext) ReplyNoMentions(content string) (*discord.Message, error) {
-	return s.SendMessageComplex(ctx.Message.ChannelID, api.SendMessageData{
-		Content:         content,
-		Reference:       &discord.MessageReference{MessageID: ctx.Message.ID},
-		AllowedMentions: &api.AllowedMentions{RepliedUser: option.False},
+	ids := idRegex.FindAllString(usersOption.String(), -1)
+	return common.SliceTransform(ids, func(idStr string) discord.UserID {
+		id, _ := strconv.ParseUint(idStr, 10, 64)
+		return discord.UserID(id)
 	})
 }
 
-func (ctx *CommandContext) ReplyErr(context string, err error) (*discord.Message, error) {
+func getUserOrUsersOption(d *discord.CommandInteraction) []discord.UserID {
+	userIDs := getMultipleUsersOption(d)
+	if users := d.Resolved.Users; len(users) > 0 {
+		userIDs = append(userIDs, maps.Keys(users)...)
+	}
+	return userIDs
+}
+
+func reply(e *gateway.InteractionCreateEvent, content string) error {
+	return replyWithFlags(e, 0, content)
+}
+
+func ephemeralReply(e *gateway.InteractionCreateEvent, content string) error {
+	return replyWithFlags(e, api.EphemeralResponse, content)
+}
+
+func replyErr(e *gateway.InteractionCreateEvent, context string, err error) error {
 	logger.Println("Err while " + context)
 	logger.Println(err)
-	return ctx.Reply("Something went wrong: ```\n" + err.Error() + "```")
+	return ephemeralReply(e, "Something went wrong: ```\n"+err.Error()+"```")
+}
+
+func replyWithFlags(e *gateway.InteractionCreateEvent, flags api.InteractionResponseFlags, content string) error {
+	return s.RespondInteraction(e.ID, e.Token, api.InteractionResponse{
+		Type: api.MessageInteractionWithSource,
+		Data: &api.InteractionResponseData{
+			Content: option.NewNullableString(content),
+			Flags:   flags,
+		},
+	})
+}
+
+func findOption(d *discord.CommandInteraction, name string) *discord.CommandInteractionOption {
+	return common.Find(d.Options, func(option *discord.CommandInteractionOption) bool {
+		return option.Name == name
+	})
+}
+
+func boolOrDefault(d *discord.CommandInteraction, name string, def bool) bool {
+	boolOption := findOption(d, name)
+	if boolOption == nil {
+		return def
+	}
+	ret, err := boolOption.BoolValue()
+	return common.Ternary(err == nil, ret, def)
 }
 
 func addCommand(cmd *Command) {
 	commandsCount++
 	commandsMap[cmd.Name] = cmd
-	for _, alias := range cmd.Aliases {
-		commandsMap[alias] = cmd
-	}
 }

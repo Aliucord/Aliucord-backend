@@ -54,3 +54,36 @@ func IsAlpha(s string) bool {
 func ToTitle(s string) string {
 	return string(unicode.ToTitle(rune(s[0]))) + s[1:]
 }
+
+func Find[E any](s []E, filter func(*E) bool) *E {
+	for _, e := range s {
+		el := &e
+		if filter(el) {
+			return el
+		}
+	}
+	return nil
+}
+
+func SliceTransform[E, R any](s []E, transform func(E) R) []R {
+	l := len(s)
+	ret := make([]R, l, l)
+	for i, e := range s {
+		ret[i] = transform(e)
+	}
+	return ret
+}
+
+func MapTransform[K comparable, V, R any](m map[K]V, transform func(K, V) R) (ret []R) {
+	for k, v := range m {
+		ret = append(ret, transform(k, v))
+	}
+	return
+}
+
+func Ternary[T any](cond bool, a, b T) T {
+	if cond {
+		return a
+	}
+	return b
+}
