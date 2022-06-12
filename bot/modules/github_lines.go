@@ -18,7 +18,7 @@ const maxContentLength = 5e6 // 5MB
 const maxCharCount = 1000
 
 var client *fasthttp.Client
-var githubLinesRegex = regexp.MustCompile(`https?://github\.com/([A-Za-z0-9\-_.]+)/([A-Za-z0-9\-_.]+)/(?:blob|tree)/(\S+?)/(\S+?)(\.\S+)?#L(\d+)[-~]?L?(\d*)`)
+var githubLinesRegex = regexp.MustCompile(`(?:[^!<]|[^!]<|^<?)https?://github\.com/([A-Za-z0-9\-_.]+)/([A-Za-z0-9\-_.]+)/(?:blob|tree)/(\S+?)/(\S+?)(\.\S+)?#L(\d+)[-~]?L?(\d*)`)
 
 func init() {
 	modules = append(modules, initGithubLines)
