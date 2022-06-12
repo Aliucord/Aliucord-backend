@@ -3,6 +3,8 @@ package updateTracker
 import (
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -113,7 +115,7 @@ func check(channel string) {
 	}
 
 	if update {
-		dl, err := getDownloadData(gpVersion, arm64, true)
+		dl, err := GetDownloadData(gpVersion, DefaultArch, true)
 		if err == nil {
 			var description string
 			if len(dl.Splits) > 0 {
@@ -121,10 +123,10 @@ func check(channel string) {
 
 				var archSplits []string
 				var languageSplits []string
-				dpiSplits := []string{"config.hdpi"}
+				dpiSplits := MissingDpiSplits
 
 				for splitName := range dl.Splits {
-					if splitName == "config."+arm64 {
+					if splitName == "config."+DefaultArch {
 						archSplits = append(archSplits, splitName)
 					} else if strings.Contains(splitName, "dpi") {
 						dpiSplits = append(dpiSplits, splitName)
@@ -133,7 +135,7 @@ func check(channel string) {
 					}
 				}
 
-				archSplits = append(archSplits, "config."+arm32, "config."+x64, "config."+x86)
+				archSplits = append(archSplits, MissingArchSplits...)
 
 				format := fmt.Sprintf("\n[%%s.apk](%s/download/discord?v=%d&split=%%s)", config.Origin, gpVersion)
 				description += joinSplits(archSplits, "Architecture", format)
@@ -175,7 +177,7 @@ func joinSplits(splits []string, title, format string) string {
 	return ret
 }
 
-func getDownloadData(version int, arch string, bypass bool) (dl *DlCache, err error) {
+func GetDownloadData(version int, arch string, bypass bool) (dl *DlCache, err error) {
 	dl, ok := dlCache[arch][version]
 	if ok && (!dl.GP || dl.Expiry > time.Now().Unix()) {
 		return dl, dl.Error
@@ -215,15 +217,16 @@ func getDownloadData(version int, arch string, bypass bool) (dl *DlCache, err er
 }
 
 func GetDownloadURL(version int, split string, bypass bool) (url string, err error) {
-	// if !bypass {
-	// 	apkName := "com.discord-" + strconv.Itoa(version) + ".apk"
-	// 	if _, err = os.Stat(config.UpdateTracker.DiscordJADX.WorkDir + "/apk/" + apkName); err == nil {
-	// 		return config.Origin + "/download/direct/" + apkName, nil
-	// 	}
-	// }
-
-	if url, ok := config.Mirrors[version]; ok {
-		return url, nil
+	if !bypass {
+		apkName := "/" + strconv.Itoa(version) + "/"
+		if split == "" {
+			apkName += "base.apk"
+		} else {
+			apkName += split + ".apk"
+		}
+		if _, err = os.Stat(config.ApkCacheDir + apkName); err == nil {
+			return config.Origin + "/download/direct" + apkName, nil
+		}
 	}
 
 	var arch string
@@ -238,7 +241,7 @@ func GetDownloadURL(version int, split string, bypass bool) (url string, err err
 		arch = arm64
 	}
 
-	dl, err := getDownloadData(version, arch, bypass)
+	dl, err := GetDownloadData(version, arch, bypass)
 	if err != nil {
 		return
 	}

@@ -11,6 +11,13 @@ const (
 	arm32 = "armeabi_v7a"
 	x64   = "x86_64"
 	x86   = "x86"
+
+	DefaultArch = arm64
+)
+
+var (
+	MissingArchSplits = []string{"config." + arm32, "config." + x64, "config." + x86}
+	MissingDpiSplits  = []string{"config.hdpi"}
 )
 
 type GooglePlayChecker struct {
@@ -56,11 +63,11 @@ func (c *GooglePlayChecker) getSessionFile(arch string) string {
 }
 
 func (c *GooglePlayChecker) Check() (v int, app *gplayapi.App, err error) {
-	err = c.init(arm64)
+	err = c.init(DefaultArch)
 	if err != nil {
 		return
 	}
-	app, err = c.clients[arm64].GetAppDetails(discordPkg)
+	app, err = c.clients[DefaultArch].GetAppDetails(discordPkg)
 	if err == nil {
 		v = app.VersionCode
 	}

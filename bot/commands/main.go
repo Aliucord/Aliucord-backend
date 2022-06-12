@@ -63,13 +63,22 @@ func InitCommands(botLogger *common.ExtendedLogger, botConfig *common.BotConfig,
 			}
 
 			if err := command.Execute(e, d); err != nil {
-				logger.LogIfErr(s.RespondInteraction(e.ID, e.Token, api.InteractionResponse{
-					Type: api.MessageInteractionWithSource,
-					Data: &api.InteractionResponseData{
-						Content: option.NewNullableString("Something went wrong, sorry :("),
-						Flags:   api.EphemeralResponse,
-					},
-				}))
+				content := option.NewNullableString("Something went wrong, sorry :(")
+				if _, err2 := s.InteractionResponse(e.AppID, e.Token); err2 == nil {
+					_, err2 = s.EditInteractionResponse(e.AppID, e.Token, api.EditInteractionResponseData{
+						Content: content,
+					})
+					logger.LogIfErr(err2)
+				} else {
+					logger.LogIfErr(s.RespondInteraction(e.ID, e.Token, api.InteractionResponse{
+						Type: api.MessageInteractionWithSource,
+						Data: &api.InteractionResponseData{
+							Content: content,
+							Flags:   api.EphemeralResponse,
+						},
+					}))
+				}
+
 				logger.Printf("Error while running command %s\n%v\n", command.Name, err)
 			}
 		}
@@ -127,6 +136,13 @@ func replyWithFlags(e *gateway.InteractionCreateEvent, flags api.InteractionResp
 			Flags:   flags,
 		},
 	})
+}
+
+func editReply(e *gateway.InteractionCreateEvent, content string) error {
+	_, err := s.EditInteractionResponse(e.AppID, e.Token, api.EditInteractionResponseData{
+		Content: option.NewNullableString(content),
+	})
+	return err
 }
 
 func findOption(d *discord.CommandInteraction, name string) *discord.CommandInteractionOption {

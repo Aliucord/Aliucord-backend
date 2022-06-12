@@ -4,7 +4,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
-	"github.com/diamondburned/arikawa/v3/utils/json/option"
 )
 
 func init() {
@@ -28,8 +27,5 @@ func pingCommand(e *gateway.InteractionCreateEvent, _ *discord.CommandInteractio
 		return err
 	}
 
-	_, err = s.EditInteractionResponse(e.AppID, e.Token, api.EditInteractionResponseData{
-		Content: option.NewNullableString("Pong! " + msg.Timestamp.Time().Sub(e.ID.Time()).String()),
-	})
-	return err
+	return editReply(e, "Pong! "+msg.Timestamp.Time().Sub(e.ID.Time()).String())
 }

@@ -13,8 +13,7 @@ type (
 		UpdateTracker  *UpdateTrackerConfig
 		MaxDownloadVer int
 		MinDownloadVer int
-		Mirrors        map[int]string
-		DisableAptoide []int
+		ApkCacheDir    string
 		Port           string
 		Origin         string
 	}
@@ -34,6 +33,8 @@ type (
 		AntiNitroScam       bool
 		NormalizeNicknames  bool
 		AutoReplyConfig     *AutoReplyConfig
+
+		ApkCacheDir string `json:"-"`
 	}
 
 	RoleIDsConfig struct {
