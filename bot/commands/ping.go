@@ -1,22 +1,31 @@
 package commands
 
 import (
+	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/diamondburned/arikawa/v3/gateway"
 )
 
 func init() {
 	addCommand(&Command{
-		Name:             "ping",
-		Aliases:          []string{},
-		Description:      "Ping!",
-		Usage:            "",
-		RequiredArgCount: 0,
-		ModOnly:          false,
-		OwnerOnly:        false,
-		Callback:         pingCommand,
+		CreateCommandData: api.CreateCommandData{
+			Name:        "ping",
+			Description: "Ping!",
+		},
+		Execute: pingCommand,
 	})
 }
 
-func pingCommand(ctx *CommandContext) (*discord.Message, error) {
-	return ctx.Reply("Pong!")
+func pingCommand(e *gateway.InteractionCreateEvent, _ *discord.CommandInteraction) error {
+	err := reply(e, "Pong!")
+	if err != nil {
+		return err
+	}
+
+	msg, err := s.InteractionResponse(e.AppID, e.Token)
+	if err != nil {
+		return err
+	}
+
+	return editReply(e, "Pong! "+msg.Timestamp.Time().Sub(e.ID.Time()).String())
 }

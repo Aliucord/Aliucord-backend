@@ -68,8 +68,7 @@
   },
   "maxDownloadVer": 0,
   "minDownloadVer": 0,
-  "mirrors": {},
-  "disableAptoide": [0],
+  "apkCacheDir": "work/apk",
   "port": "3000",
   "origin": "http://localhost:3000"
 }

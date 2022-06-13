@@ -41,11 +41,11 @@ func main() {
 	updateTracker.StartUpdateTracker(config)
 
 	log.Println("Starting http server at port", config.Port)
-	// fs := &fasthttp.FS{
-	// 	Root:        config.UpdateTracker.DiscordJADX.WorkDir + "/apk",
-	// 	PathRewrite: fasthttp.NewPathSlashesStripper(2),
-	// }
-	// fsHandler := fs.NewRequestHandler()
+	fs := &fasthttp.FS{
+		Root:        config.ApkCacheDir,
+		PathRewrite: fasthttp.NewPathSlashesStripper(2),
+	}
+	fsHandler := fs.NewRequestHandler()
 	server := fasthttp.Server{
 		Logger: &fastHttpLogger{},
 		Handler: func(ctx *fasthttp.RequestCtx) {
@@ -80,12 +80,12 @@ func main() {
 				}
 				ctx.Redirect(url, fasthttp.StatusFound)
 			default:
-				// if strings.HasPrefix(path, "/download/direct/") {
-				// 	fsHandler(ctx)
-				// } else {
-				ctx.SetStatusCode(fasthttp.StatusNotFound)
-				ctx.WriteString(fasthttp.StatusMessage(fasthttp.StatusNotFound))
-				// }
+				if strings.HasPrefix(path, "/download/direct/") {
+					fsHandler(ctx)
+				} else {
+					ctx.SetStatusCode(fasthttp.StatusNotFound)
+					ctx.WriteString(fasthttp.StatusMessage(fasthttp.StatusNotFound))
+				}
 			}
 		},
 	}

@@ -19,6 +19,7 @@ var (
 
 func StartBot(cfg *common.Config) {
 	config = cfg.Bot
+	config.ApkCacheDir = cfg.ApkCacheDir
 
 	s = state.New("Bot " + config.Token)
 	modules.InitAllModules(logger, config, s)
@@ -38,7 +39,7 @@ func StartBot(cfg *common.Config) {
 		logger.Println(err)
 	} else {
 		logger.Println("Started as", me.Tag())
-		commands.InitCommands(logger, config, s, me)
+		commands.InitCommands(logger, config, s)
 	}
 }
 
