@@ -14,6 +14,8 @@ require (
 	golang.org/x/exp v0.0.0-20220609121020-a51bd0440498 // new slices and maps api
 )
 
+require github.com/lithammer/dedent v1.1.0
+
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect

@@ -11,6 +11,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"github.com/lithammer/dedent"
 	"github.com/valyala/fasthttp"
 )
 
@@ -47,6 +48,7 @@ func initGithubLines() {
 					continue
 				}
 
+				content = dedent.Dedent(content)
 				content = strings.ReplaceAll(content, "`", "`\u200b")
 				content = strings.ReplaceAll(content, "@", "@\u200b")
 
