@@ -27,7 +27,7 @@ func init() {
 			Options: []discord.CommandOption{
 				&discord.UserOption{
 					OptionName:  "user",
-					Description: "user to normalize",
+					Description: "user",
 				},
 				&discord.StringOption{
 					OptionName:  "id",
