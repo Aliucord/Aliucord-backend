@@ -45,8 +45,8 @@ func init() {
 		},
 		OwnerOnly: true,
 		Execute: func(ev *gateway.InteractionCreateEvent, d *discord.CommandInteraction) error {
-			msg, err := s.Message(ev.ChannelID, d.TargetMessageID())
-			if err != nil {
+			msg, ok := d.Resolved.Messages[d.TargetMessageID()]
+			if !ok {
 				return ephemeralReply(ev, "Something went wrong and I couldn't fetch that message :(")
 			}
 			return eval(ev, d, msg.Content, true)

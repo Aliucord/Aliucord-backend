@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/Aliucord/Aliucord-backend/bot/modules"
-	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/Aliucord/Aliucord-backend/database"
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
@@ -227,9 +226,12 @@ func makeMuteFunc(roleID discord.RoleID) func(*gateway.InteractionCreateEvent, *
 			hasDuration, duration = parseDuration(durationStr)
 		}
 
-		reasonOption := findOption(d, "reason")
-		reason := e.Member.User.Tag() + ": " +
-			common.Ternary(reasonOption == nil, "No reason specified.", reasonOption.String())
+		reason := e.Member.User.Tag() + ": "
+		if reasonOption := findOption(d, "reason"); reasonOption == nil {
+			reason += "No reason specified."
+		} else {
+			reason += reasonOption.String()
+		}
 		if hasDuration {
 			reason += " (For " + durationStr + ")"
 		}
