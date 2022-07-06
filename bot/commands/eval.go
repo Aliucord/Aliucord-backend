@@ -45,14 +45,9 @@ func init() {
 		},
 		OwnerOnly: true,
 		Execute: func(ev *gateway.InteractionCreateEvent, d *discord.CommandInteraction) error {
-			var msg *discord.Message
-			for _, m := range d.Resolved.Messages {
-				msg = &m
-				break
-			}
-
-			if msg == nil {
-				return ephemeralReply(ev, "No message provided")
+			msg, err := s.Message(ev.ChannelID, d.TargetMessageID())
+			if err != nil {
+				return ephemeralReply(ev, "Something went wrong and I couldn't fetch that message :(")
 			}
 			return eval(ev, d, msg.Content, true)
 		},
@@ -76,7 +71,7 @@ func eval(ev *gateway.InteractionCreateEvent, d *discord.CommandInteraction, cod
 		return replyWithFlags(
 			ev,
 			common.Ternary(send, 0, api.EphemeralResponse),
-			"ERROR:```go\n"+err.Error()+"```",
+			"ERROR:```go\n"+err.Error()+"```", nil,
 		)
 	}
 	retStr := strings.ReplaceAll(fmt.Sprint(ret), "```", "`​`​`")
@@ -84,5 +79,5 @@ func eval(ev *gateway.InteractionCreateEvent, d *discord.CommandInteraction, cod
 		retStr = retStr[:1990] + "…"
 	}
 
-	return replyWithFlags(ev, common.Ternary(send, 0, api.EphemeralResponse), "```go\n"+retStr+"```")
+	return replyWithFlags(ev, common.Ternary(send, 0, api.EphemeralResponse), "```go\n"+retStr+"```", nil)
 }

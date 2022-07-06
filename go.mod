@@ -5,7 +5,7 @@ go 1.18
 require (
 	// github.com/Juby210/admh v0.0.5
 	github.com/Juby210/gplayapi-go v0.0.6
-	github.com/diamondburned/arikawa/v3 v3.0.0-rc.6.0.20220606005652-ea5251df0ffb
+	github.com/diamondburned/arikawa/v3 v3.0.0-rc.6.0.20220705202122-c1e8daec6049
 	github.com/mattn/anko v0.1.9
 	github.com/uptrace/bun v1.1.5
 	github.com/uptrace/bun/dialect/pgdialect v1.1.5

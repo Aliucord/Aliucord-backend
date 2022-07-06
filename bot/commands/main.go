@@ -115,11 +115,11 @@ func getUserOrUsersOption(d *discord.CommandInteraction) []discord.UserID {
 }
 
 func reply(e *gateway.InteractionCreateEvent, content string) error {
-	return replyWithFlags(e, 0, content)
+	return replyWithFlags(e, 0, content, nil)
 }
 
 func ephemeralReply(e *gateway.InteractionCreateEvent, content string) error {
-	return replyWithFlags(e, api.EphemeralResponse, content)
+	return replyWithFlags(e, api.EphemeralResponse, content, nil)
 }
 
 func replyErr(e *gateway.InteractionCreateEvent, context string, err error) error {
@@ -128,12 +128,14 @@ func replyErr(e *gateway.InteractionCreateEvent, context string, err error) erro
 	return ephemeralReply(e, "Something went wrong: ```\n"+err.Error()+"```")
 }
 
-func replyWithFlags(e *gateway.InteractionCreateEvent, flags api.InteractionResponseFlags, content string) error {
+func replyWithFlags(e *gateway.InteractionCreateEvent, flags api.InteractionResponseFlags, content string, embeds *[]discord.Embed) error {
 	return s.RespondInteraction(e.ID, e.Token, api.InteractionResponse{
 		Type: api.MessageInteractionWithSource,
 		Data: &api.InteractionResponseData{
-			Content: option.NewNullableString(content),
-			Flags:   flags,
+			Content:         option.NewNullableString(content),
+			Flags:           flags,
+			Embeds:          embeds,
+			AllowedMentions: &api.AllowedMentions{},
 		},
 	})
 }
