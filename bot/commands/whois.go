@@ -16,7 +16,6 @@ func init() {
 			Name: "Whois",
 			Type: discord.UserCommand,
 		},
-		ModOnly: false,
 		Execute: whoisCommand,
 	})
 
@@ -35,7 +34,6 @@ func init() {
 				},
 			},
 		},
-		ModOnly: true,
 		Execute: whoisCommand,
 	})
 }
