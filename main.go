@@ -25,9 +25,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
 	var config *common.Config
 	err = json.NewDecoder(f).Decode(&config)
+	f.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
