@@ -33,6 +33,7 @@ type (
 		AntiNitroScam       bool
 		NormalizeNicknames  bool
 		AutoReplyConfig     *AutoReplyConfig
+		AntiZip             *AntiZipConfig
 
 		ApkCacheDir string `json:"-"`
 	}
@@ -44,6 +45,7 @@ type (
 		DevMuted        discord.RoleID
 		ReactionMuted   discord.RoleID
 		AttachmentMuted discord.RoleID
+		IgnoredRoles    []discord.RoleID
 	}
 
 	StarboardConfig struct {
@@ -100,12 +102,16 @@ type (
 	AutoReplyConfig struct {
 		ToggleableModule
 
-		IgnoredRoles []discord.RoleID
-
 		PRD         discord.ChannelID
 		PluginsList discord.ChannelID
 		NewPlugins  discord.ChannelID
 
 		SupportCategory discord.ChannelID
+	}
+
+	AntiZipConfig struct {
+		ToggleableModule
+
+		TargetChannels []discord.ChannelID
 	}
 )
