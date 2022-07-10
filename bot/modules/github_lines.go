@@ -2,6 +2,7 @@ package modules
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -47,6 +48,7 @@ func initGithubLines() {
 					continue
 				}
 
+				content = unindent(content)
 				content = strings.ReplaceAll(content, "`", "`\u200b")
 				content = strings.ReplaceAll(content, "@", "@\u200b")
 
@@ -145,4 +147,28 @@ func getContent(url, startStr, endStr string) string {
 	}
 
 	return ""
+}
+
+// m flag makes ^ operate on the beginning of each line instead of only the beginning of the string
+var indentPattern = regexp.MustCompile(`(?m)^ *\S`)
+
+func unindent(code string) string {
+	// Replace tabs with 4 spaces
+	code = strings.ReplaceAll(code, "\t", "    ")
+
+	minIndent := math.MaxInt32
+	for _, indent := range indentPattern.FindAllStringSubmatch(code, -1) {
+		// Since go does not support positive lookahead, the pattern also matches the first non whitespace
+		// (to ignore lines with only whitespace)
+		l := len(indent[0]) - 1
+		if l < minIndent {
+			minIndent = l
+		}
+	}
+	if minIndent == math.MaxInt32 || minIndent == 0 {
+		return code
+	}
+
+	pat := regexp.MustCompile("(?m)^ {" + strconv.Itoa(minIndent) + "}")
+	return pat.ReplaceAllString(code, "")
 }
