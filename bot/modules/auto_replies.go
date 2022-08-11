@@ -72,7 +72,7 @@ func initAutoReplies() {
 		r("<@!?\\d{2,19}> help"):                       MentionHelp,
 		r("help <@!?\\d{2,19}>"):                       MentionHelp,
 		r("animated (profile|avatar|pfp)"):             FreeNitro,
-		r("^is there a plugin .+"):                     FindPlugin,
+		r("^is there a plugin.+"):                     FindPlugin,
 		r("^where(?: i)?s(?: the )?.+ plugin$"):        FindPlugin,
 		r("^can (?:anyone|you) help(?: me)?\\??$"):     JustAsk,
 		//r("can'?t (download|find|get) plugin ?downloader"): PluginDownloader, we dont need this lol
@@ -82,7 +82,7 @@ func initAutoReplies() {
 		r("how (?:to|do I|do you|can i) create (?:a theme|themes|theme)"):                                             CreateThemes,
 		r("how (?:to|do i|do you|can i|put) (?:change|upload|add|set) (?:sounds|custom sounds|sound|custom sound).+"): ThemeSounds,
 		r("how (?:to|do i|do you|can i) get sounds? (?:url|link)"):                                                    GetSound,
-		r("(?:does anyone know|is there) a theme .+"):                                                                 SearchThemes,
+		r("(?:does anyone know|is there) a theme.+"):                                                                 SearchThemes,
 		r("(?:my )?aliucord (?:crashed|keeps crashing|crash|crashes|is crashing|crashing)"):                           AliuCrash,
 		r("^(?:why|with) (?:is) full transparency (?:is not|not|will not) (?:work|working)"):                          FullTransparency,
 	}
