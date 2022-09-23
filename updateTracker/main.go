@@ -145,7 +145,7 @@ func check(channel string) {
 				description = fmt.Sprintf("[Click here to download apk](%s/download/discord?v=%d)", config.Origin, gpVersion)
 			}
 			err = wh.Execute(webhook.ExecuteData{
-				Username: "Discord Update - " + common.ToTitle(channel),
+				Username: "Update - " + common.ToTitle(channel),
 				Embeds: []discord.Embed{{
 					Author: &discord.EmbedAuthor{
 						Name: app.DisplayName,
