@@ -24,8 +24,6 @@ type (
 		Token               string
 		OwnerIDs            []discord.UserID
 		RoleIDs             *RoleIDsConfig
-		CommandsPrefix      string
-		OwnerCommandsPrefix string
 		Starboard           *StarboardConfig
 		AutoPublish         bool
 		TrollSupportRole    *TrollSupportRoleConfig

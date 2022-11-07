@@ -74,7 +74,7 @@ func InitCommands(botLogger *common.ExtendedLogger, botConfig *common.BotConfig,
 						Type: api.MessageInteractionWithSource,
 						Data: &api.InteractionResponseData{
 							Content: content,
-							Flags:   api.EphemeralResponse,
+							Flags:   discord.EphemeralMessage,
 						},
 					}))
 				}
@@ -119,7 +119,7 @@ func reply(e *gateway.InteractionCreateEvent, content string) error {
 }
 
 func ephemeralReply(e *gateway.InteractionCreateEvent, content string) error {
-	return replyWithFlags(e, api.EphemeralResponse, content, nil)
+	return replyWithFlags(e, discord.EphemeralMessage, content, nil)
 }
 
 func replyErr(e *gateway.InteractionCreateEvent, context string, err error) error {
@@ -128,7 +128,7 @@ func replyErr(e *gateway.InteractionCreateEvent, context string, err error) erro
 	return ephemeralReply(e, "Something went wrong: ```\n"+err.Error()+"```")
 }
 
-func replyWithFlags(e *gateway.InteractionCreateEvent, flags api.InteractionResponseFlags, content string, embeds *[]discord.Embed) error {
+func replyWithFlags(e *gateway.InteractionCreateEvent, flags discord.MessageFlags, content string, embeds *[]discord.Embed) error {
 	return s.RespondInteraction(e.ID, e.Token, api.InteractionResponse{
 		Type: api.MessageInteractionWithSource,
 		Data: &api.InteractionResponseData{
