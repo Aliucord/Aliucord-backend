@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Aliucord/Aliucord-backend/common"
+	"github.com/Juby210/gplayapi-go"
 	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/discord"
 )
@@ -116,6 +117,14 @@ func check(channel string) {
 
 	if update {
 		dl, err := GetDownloadData(gpVersion, DefaultArch, true)
+
+		// workaround
+		if err == gplayapi.ErrMissingAppDeliveryData {
+			delete(dlCache[DefaultArch], gpVersion)
+			gpCheckers["alpha"].clients[DefaultArch] = nil
+			dl, err = GetDownloadData(gpVersion, DefaultArch, true)
+		}
+
 		if err == nil {
 			var description string
 			if len(dl.Splits) > 0 {

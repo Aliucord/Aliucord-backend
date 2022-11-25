@@ -70,7 +70,7 @@ func eval(ev *gateway.InteractionCreateEvent, d *discord.CommandInteraction, cod
 	if err != nil {
 		return replyWithFlags(
 			ev,
-			common.Ternary(send, 0, api.EphemeralResponse),
+			common.Ternary(send, 0, discord.EphemeralMessage),
 			"ERROR:```go\n"+err.Error()+"```", nil,
 		)
 	}
@@ -79,5 +79,5 @@ func eval(ev *gateway.InteractionCreateEvent, d *discord.CommandInteraction, cod
 		retStr = retStr[:1990] + "…"
 	}
 
-	return replyWithFlags(ev, common.Ternary(send, 0, api.EphemeralResponse), "```go\n"+retStr+"```", nil)
+	return replyWithFlags(ev, common.Ternary(send, 0, discord.EphemeralMessage), "```go\n"+retStr+"```", nil)
 }

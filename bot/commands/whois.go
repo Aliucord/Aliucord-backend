@@ -87,7 +87,7 @@ func whoisCommand(e *gateway.InteractionCreateEvent, d *discord.CommandInteracti
 		name = "🤖 " + name
 	}
 
-	return replyWithFlags(e, api.EphemeralResponse, user.Mention(), &[]discord.Embed{
+	return replyWithFlags(e, discord.EphemeralMessage, user.Mention(), &[]discord.Embed{
 		{
 			Author: &discord.EmbedAuthor{
 				Name: name,

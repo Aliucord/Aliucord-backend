@@ -101,7 +101,7 @@ func apkCacheCommand(ev *gateway.InteractionCreateEvent, d *discord.CommandInter
 
 		err = s.RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
 			Type: api.DeferredMessageInteractionWithSource,
-			Data: &api.InteractionResponseData{Flags: api.EphemeralResponse},
+			Data: &api.InteractionResponseData{Flags: discord.EphemeralMessage},
 		})
 		if err != nil {
 			return err
