@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -45,18 +44,14 @@ func main() {
 		Root:        config.ApkCacheDir,
 		PathRewrite: fasthttp.NewPathSlashesStripper(2),
 	}
-	fsHandler := fs.NewRequestHandler()
+	apkFsHandler := fs.NewRequestHandler()
+	staticFs := &fasthttp.FS{Root: "static", IndexNames: []string{"index.html"}}
+	staticFsHandler := staticFs.NewRequestHandler()
 	server := fasthttp.Server{
 		Logger: &fastHttpLogger{},
 		Handler: func(ctx *fasthttp.RequestCtx) {
 			path := string(ctx.Path())
 			switch path {
-			case "/":
-				ctx.Response.Header.Set("Content-Type", "text/html; charset=utf-8")
-				fmt.Fprint(
-					ctx,
-					"<html><head><title>Aliucord</title></head><body>High quality™ temp page.<br><a href=\"/links/github\">[GitHub Org]</a> <a href=\"/links/discord\">[Discord Server]</a></body></html>",
-				)
 			case "/links/github":
 				ctx.Redirect("https://github.com/Aliucord", fasthttp.StatusMovedPermanently)
 			case "/links/discord":
@@ -81,10 +76,9 @@ func main() {
 				ctx.Redirect(url, fasthttp.StatusFound)
 			default:
 				if strings.HasPrefix(path, "/download/direct/") {
-					fsHandler(ctx)
+					apkFsHandler(ctx)
 				} else {
-					ctx.SetStatusCode(fasthttp.StatusNotFound)
-					ctx.WriteString(fasthttp.StatusMessage(fasthttp.StatusNotFound))
+					staticFsHandler(ctx)
 				}
 			}
 		},

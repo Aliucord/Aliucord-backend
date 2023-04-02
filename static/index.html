@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Aliucord Website</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+<div class="container">
+    <div class="header">
+        <img src="aliucord.png" alt="Aliucord logo">
+        <h1>Aliucord</h1>
+        <p>A customizable Discord client for Android</p>
+    </div>
+    <div class="content">
+        <p>Aliucord is a customizable Discord client that offers a wide range of features and functionality beyond
+            what's available in the standard Discord client. With Aliucord, users can customize their Discord
+            experience to suit their needs and preferences, from changing the look and feel of the app to adding new
+            features and integrations.</p>
+        <div class="buttons">
+            <a href="/links/github" target="_blank">
+                <button>Our Github</button>
+            </a>
+            <a href="https://github.com/Aliucord/Aliucord#-installation">
+                <button>Get Started</button>
+            </a>
+            <a href="/links/discord" target="_blank">
+                <button>Join Discord</button>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="faq" id="faq">
+    <h2>FAQ</h2>
+    <div class="question">
+        <div class="question-toggle">
+            <a href="#">Is tracking & telemetry disabled / is there a no track plugin?</a>
+            <span class="plus">+</span>
+            <span class="minus">-</span>
+        </div>
+        <div class="question-content">
+            <p>Yes, NoTrack is part of the CorePlugins. Crashlytics, Adjust, Discord analytics and Spotify analytics are
+                all disabled.</p>
+        </div>
+    </div>
+    <div class="question">
+        <div class="question-toggle">
+            <a href="#">Will I get banned for using Aliucord? Will plugin X get me banned?</a>
+            <span class="plus">+</span>
+            <span class="minus">-</span>
+        </div>
+        <div class="question-content">
+            <p>Client modifications are against Discord's Terms of Service. However, Discord is pretty indifferent about
+                them and there are no known cases of users getting banned for using client mods. So you should generally
+                be fine as long as you don't use plugins that bypass api restrictions or implement spammy / selfbot
+                behaviour (mass deleting, spam plugins, etc).</p>
+            <p>Regardless, if your account is very important to you and it getting disabled would be a disaster for you,
+                you should probably not use client mods.</p>
+            <p>Additionally, make sure not to post screenshots with Aliucord in a server where you might get banned or
+                reported for it.</p>
+        </div>
+    </div>
+    <div class="question">
+        <div class="question-toggle">
+            <a href="#">Where can I find plugins?</a>
+            <span class="plus">+</span>
+            <span class="minus">-</span>
+        </div>
+        <div class="question-content">
+            <p>You can find a lost of plugins on our <a href="/links/discord" target="_blank">Discord server - #plugins-list channel</a>.
+        </div>
+    </div>
+    <div class="question">
+        <div class="question-toggle">
+            <a href="#">Google Play Protect says Aliucord is potentially harmful</a>
+            <span class="plus">+</span>
+            <span class="minus">-</span>
+        </div>
+        <div class="question-content">
+            <p>Every Android app is signed with a signature by its developer. This way Android can confirm an apk comes
+                from a credible source and wasn't tampered with. Because Aliucord is built locally on your device, that
+                also means it is signed locally on your device, with a signature created just for you. This means that
+                the signature of your Aliucord app is unique and Google doesn't recognise it. Thus</p>
+        </div>
+    </div>
+</div>
+
+<p>
+    Website made by <a href="https://mercenarylabs.net/breado" target="_blank">Breado#5112</a> on Discord<br>
+    <span style="font-size: 0.8rem">Aliucord is not affiliated or endorsed by Discord. Discord is a trademark of Discord Inc.</span>
+</p>
+
+
+<script>
+    const toggleButtons = document.querySelectorAll(".question-toggle");
+
+    toggleButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            button.classList.toggle("active");
+            const content = button.nextElementSibling;
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
+    });
+</script>
+</body>
+</html>
