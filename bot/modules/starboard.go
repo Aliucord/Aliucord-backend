@@ -137,7 +137,7 @@ func processStarCount(msg *discord.Message, count int) {
 func generateMessageEmbed(msg *discord.Message) discord.Embed {
 	e := discord.Embed{
 		Author: &discord.EmbedAuthor{
-			Name: msg.Author.Tag(),
+			Name: msg.Author.DisplayOrTag(),
 			Icon: msg.Author.AvatarURL(),
 		},
 		Description: msg.Content,

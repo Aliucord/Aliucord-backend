@@ -2,6 +2,7 @@ package commands
 
 import (
 	"regexp"
+	"slices"
 	"strconv"
 
 	"github.com/Aliucord/Aliucord-backend/common"
@@ -11,7 +12,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
 )
 
 var (

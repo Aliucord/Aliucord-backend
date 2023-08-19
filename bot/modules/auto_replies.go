@@ -3,11 +3,11 @@ package modules
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
-	"golang.org/x/exp/slices"
 )
 
 func init() {

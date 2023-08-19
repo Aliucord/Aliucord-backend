@@ -67,7 +67,7 @@ func Find[E any](s []E, filter func(*E) bool) *E {
 
 func SliceTransform[E, R any](s []E, transform func(E) R) []R {
 	l := len(s)
-	ret := make([]R, l, l)
+	ret := make([]R, l)
 	for i, e := range s {
 		ret[i] = transform(e)
 	}

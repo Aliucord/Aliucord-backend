@@ -18,7 +18,7 @@ func initAutoPublisher() {
 		channel, err := s.Channel(msg.ChannelID)
 		if err != nil {
 			logger.Printf("Failed to get channel\n%v\n", err)
-		} else if channel.Type == discord.GuildNews {
+		} else if channel.Type == discord.GuildAnnouncement {
 			_, err = s.CrosspostMessage(msg.ChannelID, msg.ID)
 			if err != nil {
 				logger.Printf(

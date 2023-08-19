@@ -1,9 +1,10 @@
 package modules
 
 import (
+	"slices"
+
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/gateway"
-	"golang.org/x/exp/slices"
 )
 
 func init() {

@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -13,7 +14,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
 )
 
 var durationRegex = regexp.MustCompile("(\\d+)(s|seconds|secs?|m|mins?|minutes|h|hours|d|days|w|weeks)")
