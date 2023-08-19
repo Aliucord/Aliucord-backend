@@ -226,7 +226,7 @@ func makeMuteFunc(roleID discord.RoleID) func(*gateway.InteractionCreateEvent, *
 			hasDuration, duration = parseDuration(durationStr)
 		}
 
-		reason := e.Member.User.Tag() + ": "
+		reason := e.Member.User.Tag() + " - "
 		if reasonOption := findOption(d, "reason"); reasonOption == nil {
 			reason += "No reason specified."
 		} else {
@@ -241,12 +241,18 @@ func makeMuteFunc(roleID discord.RoleID) func(*gateway.InteractionCreateEvent, *
 		}
 
 		errorCount := 0
+		mentions := ""
 		for _, id := range userIDs {
-			addMuteRole(e.GuildID, id, roleID, data, &errorCount, hasDuration, duration)
+			if err := addMuteRole(e.GuildID, id, roleID, data, hasDuration, duration); err == nil {
+				mentions += " " + id.Mention()
+			} else {
+				errorCount++
+				logger.Println(err)
+			}
 		}
 
 		if errorCount == 0 {
-			return reply(e, "Muted!")
+			return reply(e, "Muted"+mentions+" by "+reason)
 		} else {
 			return reply(e, "I did not manage to give everyone the role. I failed on "+strconv.Itoa(errorCount)+" members :(")
 		}
@@ -318,14 +324,10 @@ func addMuteRole(
 	uID discord.UserID,
 	rID discord.RoleID,
 	data api.AddRoleData,
-	errorCount *int,
 	hasDuration bool,
 	duration int64,
-) {
-	if err := s.AddRole(gID, uID, rID, data); err != nil {
-		*errorCount++
-		logger.Println(err)
-	} else {
+) (err error) {
+	if err = s.AddRole(gID, uID, rID, data); err == nil {
 		var endDate int64 = -1
 		if hasDuration {
 			endDate = time.Now().Unix() + duration
@@ -357,6 +359,7 @@ func addMuteRole(
 			startUnmuteTimer(mute)
 		}
 	}
+	return
 }
 
 func startUnmuteTimer(mute database.Mute) {
