@@ -254,7 +254,7 @@ func makeMuteFunc(roleID discord.RoleID) func(*gateway.InteractionCreateEvent, *
 		if errorCount == 0 {
 			return reply(e, "Muted"+mentions+" by "+reason)
 		} else {
-			return reply(e, "I did not manage to give everyone the role. I failed on "+strconv.Itoa(errorCount)+" members :(")
+			return reply(e, "Failed on "+strconv.Itoa(errorCount)+" members, muted"+mentions+" by "+reason)
 		}
 	}
 }
@@ -287,7 +287,7 @@ func makeUnmuteFunc(roleID discord.RoleID, muteName string) func(*gateway.Intera
 			Exec(context.Background())
 		logger.LogIfErr(err)
 
-		return reply(e, "Unmuted!")
+		return reply(e, "Unmuted "+member.User.Tag())
 	}
 }
 
