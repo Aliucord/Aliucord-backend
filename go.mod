@@ -10,7 +10,6 @@ require (
 	github.com/uptrace/bun/dialect/pgdialect v1.1.14
 	github.com/uptrace/bun/driver/pgdriver v1.1.14
 	github.com/valyala/fasthttp v1.48.0
-	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63 // new maps api
 )
 
 require (

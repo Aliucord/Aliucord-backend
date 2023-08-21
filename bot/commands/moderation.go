@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/Aliucord/Aliucord-backend/bot/modules"
+	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/Aliucord/Aliucord-backend/database"
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
-	"golang.org/x/exp/maps"
 )
 
 var durationRegex = regexp.MustCompile("(\\d+)(s|seconds|secs?|m|mins?|minutes|h|hours|d|days|w|weeks)")
@@ -261,7 +261,7 @@ func makeMuteFunc(roleID discord.RoleID) func(*gateway.InteractionCreateEvent, *
 
 func makeUnmuteFunc(roleID discord.RoleID, muteName string) func(*gateway.InteractionCreateEvent, *discord.CommandInteraction) error {
 	return func(e *gateway.InteractionCreateEvent, d *discord.CommandInteraction) error {
-		userIDs := maps.Keys(d.Resolved.Users)
+		userIDs := common.MapKeys(d.Resolved.Users)
 		if len(userIDs) != 1 {
 			return ephemeralReply(e, "Mention someone!")
 		}

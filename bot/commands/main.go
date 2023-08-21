@@ -11,7 +11,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
-	"golang.org/x/exp/maps"
 )
 
 var (
@@ -109,7 +108,7 @@ func getMultipleUsersOption(d *discord.CommandInteraction) []discord.UserID {
 func getUserOrUsersOption(d *discord.CommandInteraction) []discord.UserID {
 	userIDs := getMultipleUsersOption(d)
 	if users := d.Resolved.Users; len(users) > 0 {
-		userIDs = append(userIDs, maps.Keys(users)...)
+		userIDs = append(userIDs, common.MapKeys(users)...)
 	}
 	return userIDs
 }

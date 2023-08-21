@@ -74,11 +74,20 @@ func SliceTransform[E, R any](s []E, transform func(E) R) []R {
 	return ret
 }
 
-func MapTransform[K comparable, V, R any](m map[K]V, transform func(K, V) R) (ret []R) {
-	for k, v := range m {
-		ret = append(ret, transform(k, v))
+func MapKeys[M ~map[K]V, K comparable, V any](m M) []K {
+	r := make([]K, 0, len(m))
+	for k := range m {
+		r = append(r, k)
 	}
-	return
+	return r
+}
+
+func MapTransform[M ~map[K]V, K comparable, V, R any](m M, transform func(K, V) R) []R {
+	r := make([]R, 0, len(m))
+	for k, v := range m {
+		r = append(r, transform(k, v))
+	}
+	return r
 }
 
 func Ternary[T any](cond bool, a, b T) T {
