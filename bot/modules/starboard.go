@@ -6,9 +6,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"github.com/diamondburned/arikawa/v3/utils/json/option"
 )
 
 func init() {
@@ -63,7 +65,7 @@ func initStarboard() {
 }
 
 func processReaction(channelID discord.ChannelID, msgID discord.MessageID, emoji discord.Emoji, userID discord.UserID) {
-	if emoji.Name != "⭐" || IsChannelIgnored(channelID) {
+	if emoji.Name != "⭐" || isChannelIgnored(channelID) {
 		return
 	}
 
@@ -100,11 +102,12 @@ func processStarCount(msg *discord.Message, count int) {
 	}
 
 	var starboardMsg *discord.Message
+	idStr := msg.ID.String()
 	for _, m := range messages {
+		embedsLen := len(m.Embeds)
 		if m.Author.ID == s.Ready().User.ID &&
-			len(m.Embeds) == 1 &&
-			m.Embeds[0].Footer != nil &&
-			strings.HasSuffix(m.Embeds[0].Footer.Text, msg.ID.String()) {
+			embedsLen > 0 && m.Embeds[embedsLen-1].Footer != nil &&
+			strings.HasSuffix(m.Embeds[embedsLen-1].Footer.Text, idStr) {
 			starboardMsg = &m
 			break
 		}
@@ -120,24 +123,52 @@ func processStarCount(msg *discord.Message, count int) {
 	content := fmt.Sprintf("%s %d | <#%s>", getStarboardEmote(count), count, msg.ChannelID)
 	if starboardMsg != nil {
 		if starboardMsg.Content != content {
-			s.EditMessage(config.Starboard.Channel, starboardMsg.ID, content, generateMessageEmbed(msg))
+			data := api.EditMessageData{Content: option.NewNullableString(content)}
+			e := generateMessageEmbed(msg, false)
+			ref := msg.ReferencedMessage
+			if ref == nil {
+				data.Embeds = &[]discord.Embed{e}
+			} else {
+				data.Embeds = &[]discord.Embed{generateMessageEmbed(msg.ReferencedMessage, true), e}
+				components := *starboardMsg.Components[0].(*discord.ActionRowComponent)
+				if len(components) == 1 {
+					data.Components = &discord.ContainerComponents{&discord.ActionRowComponent{
+						components[0], generateJumpToRef(ref.URL()),
+					}}
+				}
+			}
+			s.EditMessageComplex(config.Starboard.Channel, starboardMsg.ID, data)
 		}
 	} else {
-		s.SendMessageComplex(config.Starboard.Channel, api.SendMessageData{
-			Content: content,
-			Embeds:  []discord.Embed{generateMessageEmbed(msg)},
-			Components: discord.Components(&discord.ButtonComponent{
-				Label: "Jump",
-				Style: discord.LinkButtonStyle(msg.URL()),
-			}),
-		})
+		components := discord.ActionRowComponent{&discord.ButtonComponent{
+			Label: "Jump",
+			Style: discord.LinkButtonStyle(msg.URL()),
+		}}
+		data := api.SendMessageData{Content: content, Components: discord.ContainerComponents{&components}}
+		e := generateMessageEmbed(msg, false)
+		ref := msg.ReferencedMessage
+		if ref == nil {
+			data.Embeds = []discord.Embed{e}
+		} else {
+			data.Embeds = []discord.Embed{generateMessageEmbed(ref, true), e}
+			components = append(components, generateJumpToRef(ref.URL()))
+		}
+		s.SendMessageComplex(config.Starboard.Channel, data)
 	}
 }
 
-func generateMessageEmbed(msg *discord.Message) discord.Embed {
+func generateJumpToRef(url string) *discord.ButtonComponent {
+	return &discord.ButtonComponent{
+		Label: "Jump to referenced message",
+		Style: discord.LinkButtonStyle(url),
+	}
+}
+
+func generateMessageEmbed(msg *discord.Message, reply bool) discord.Embed {
+	tag := msg.Author.DisplayOrTag()
 	e := discord.Embed{
 		Author: &discord.EmbedAuthor{
-			Name: msg.Author.DisplayOrTag(),
+			Name: common.Ternary(reply, "Replying to "+tag, tag),
 			Icon: msg.Author.AvatarURL(),
 		},
 		Description: msg.Content,
@@ -145,7 +176,7 @@ func generateMessageEmbed(msg *discord.Message) discord.Embed {
 			Text: "ID: " + msg.ID.String(),
 		},
 		Timestamp: msg.Timestamp,
-		Color:     16777130,
+		Color:     common.Ternary(reply, discord.Color(0), 16777130),
 	}
 
 	attachments := ""
@@ -175,7 +206,7 @@ func generateMessageEmbed(msg *discord.Message) discord.Embed {
 	return e
 }
 
-func IsChannelIgnored(id discord.ChannelID) bool {
+func isChannelIgnored(id discord.ChannelID) bool {
 	for _, cid := range config.Starboard.Ignore {
 		if cid == id {
 			return true
