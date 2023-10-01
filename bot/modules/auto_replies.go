@@ -73,18 +73,18 @@ func initAutoReplies() {
 		r("help <@!?\\d{2,19}>"):                                       MentionHelp,
 		r("animated (profile|avatar|pfp)"):                             FreeNitro,
 		r("is there a plugin.+"):                                       FindPlugin,
-		r("^where(?: i)?\'?s(?: the )?.+ plugin$"):   				    FindPlugin,
+		r("^where(?: i)?\\'?s(?: the )?.+ plugin$"):   				    FindPlugin,
 		r("^can (?:someone|anybody|anyone|you) help(?: me)?\\??$"):     JustAsk,
 		//r("can'?t (download|find|get) plugin ?downloader"): PluginDownloader, we dont need this lol
 		//r("where(?: i)s(?: the)? plugin ?downloader"):  PluginDownloader,
-		r("(?:where|how) (?:to|do I|do you) (?:install|download|get) (?:plugin|plugins|a plugin)"):                       InstallPlugins,
-		r("how (?:to|do i|do you|i) (?:install|download|apply|get|use) (?:a theme|theme|themes)"):                        InstallThemes,
-		r("how (?:to|do i|do you|can i) (?:create|make|do) (?:a theme|themes|(my own |a? custom )?theme)"):               CreateThemes,
-		r("how (?:to|do i|do you|can i|put) (?:change|upload|add|set) (?:sounds|custom sounds|sound|custom sound)"):      ThemeSounds,
+		r("(?:where|how) (?:to|do i|do you) (?:install|download|get) (?:a?.?plugins?)"):                	         	  InstallPlugins,
+		r("how (?:to|do i|do you|i) (?:install|download|apply|get|use) (?:a?.?themes?)"):                     	    	  InstallThemes,
+		r("how (?:to|do i|do you|can i) (?:create|make|do) (?:a theme|(my own |a?.?custom )?themes?)"):             	  CreateThemes,
+		r("how (?:to|do i|do you|can i|put) (?:change|upload|add|set) (?:sounds?|custom sounds?)"): 			 	      ThemeSounds,
 		r("how (?:to|do i|do you|can i) get sounds?(?: url| link)?"):                                                     GetSound,
 		r("(does anyone know|is there) an? (\w.+)?theme"):                                                                SearchThemes,
 		r("(my )?aliucord (\w.+)?(?:crashed|keeps crashing|crash|crashes|is crashing|crashing|stopped( working)?)"):      AliuCrash,
-		r("(why |with )?(?:is )?full transparency (?:is not|not|will not|doesn\'t|does not) (?:work|working)"):           FullTransparency,
+		r("(why |with )?(?:is )?full transparency (?:is?.?not|will not|doesn\\'t|does not) (?:work)"):                     FullTransparency,
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
