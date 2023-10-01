@@ -42,7 +42,7 @@ const (
 	FullTransparency = "1. Are you using a theme that requires full transparency? If the answer is no, then that's the problem. Normally in the description says what transparency you need to use. 2. Are you using a custom ROM? If the answer is yes, then we can't do nothing about it."
 	SearchThemes     = "Check <#824357609778708580> and search on there, maybe there's the theme you want"
 	AliuCrash        = "Send crashlogs (check Crashes in Settings, and copy the most recent), if there aren't any crashlogs, then we can't do nothing about it. (If you want, you can try send a logcat, check <https://pastebin.com/pNhXwhrd>)"
-	FreeNitro        = "Not possible. Nitrospoof exists for \"free\" emotes, UserBG exists for using a custom banner (read the plugin's description), UserPFP exists for using a custom banner (read the description of that too), for anything else buy nitro."
+	FreeNitro        = "Not possible. Nitrospoof exists for \"free\" emotes, UserBG exists for using a custom banner (read the plugin's description), UserPFP exists for using a custom profile picture (read the description of that too), for anything else buy nitro."
 	Usage            = "Go to the plugin's repository and read the readme. Chances are the dev added a description."
 	BetterInternet   = "This happens when you have an old/misbehaving router. Use mobile data (~120mb usage) or maybe a VPN (*or just get better internet*)."
 	PluginDownloader = "PluginDownloader is now a part of Aliucord. (It won't be present in the plugin list) If the option to download plugins is still missing, update Aliucord."
@@ -73,10 +73,10 @@ func initAutoReplies() {
 		r("help <@!?\\d{2,19}>"):                                       MentionHelp,
 		r("animated (profile|avatar|pfp)"):                             FreeNitro,
 		r("is there a plugin.+"):                                       FindPlugin,
-		r("^where(?: i)?\\'?s(?: the )?.+ plugin$"):   				    FindPlugin,
+		r("^where(?: i)?'?s(?: the )?.+ plugin$"):   				    FindPlugin,
 		r("^can (?:someone|anybody|anyone|you) help(?: me)?\\??$"):     JustAsk,
-		//r("can'?t (download|find|get) plugin ?downloader"): PluginDownloader, we dont need this lol
-		//r("where(?: i)s(?: the)? plugin ?downloader"):  PluginDownloader,
+		r("(can.?not|can'?t) (download|find|get) plugin downloader"):   PluginDownloader,
+		r("where( i)?'?s( the)? plugin downloader"):                    PluginDownloader,
 		r("(?:where|how) (?:to|do i|do you) (?:install|download|get) (?:a?.?plugins?)"):                	         	  InstallPlugins,
 		r("how (?:to|do i|do you|i) (?:install|download|apply|get|use) (?:a?.?themes?)"):                     	    	  InstallThemes,
 		r("how (?:to|do i|do you|can i) (?:create|make|do) (?:a theme|(my own |a?.?custom )?themes?)"):             	  CreateThemes,
