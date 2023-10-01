@@ -77,14 +77,14 @@ func initAutoReplies() {
 		r("^can (?:someone|anybody|anyone|you) help(?: me)?\\??$"):     JustAsk,
 		r("(can.?not|can'?t) (download|find|get) plugin downloader"):   PluginDownloader,
 		r("where( i)?'?s( the)? plugin downloader"):                    PluginDownloader,
-		r("(?:where|how) (?:to|do i|do you) (?:install|download|get) (?:a?.?plugins?)"):                	         	  InstallPlugins,
-		r("how (?:to|do i|do you|i) (?:install|download|apply|get|use) (?:a?.?themes?)"):                     	    	  InstallThemes,
-		r("how (?:to|do i|do you|can i) (?:create|make|do) (?:a theme|(my own |a?.?custom )?themes?)"):             	  CreateThemes,
+		r("(?:where|how) (?:to|do i|do you) (?:install|download|get) a? ?plugins?"):                	         	  InstallPlugins,
+		r("how (?:to|do i|do you|i) (?:install|download|apply|get|use) a? ?themes?"):                     	    	  InstallThemes,
+		r("how (?:to|do i|do you|can i) (?:create|make|do) (?:a|my own)? ?(?:custom)? ?themes?"):             	  CreateThemes,
 		r("how (?:to|do i|do you|can i|put) (?:change|upload|add|set) (?:sounds?|custom sounds?)"): 			 	      ThemeSounds,
 		r("how (?:to|do i|do you|can i) get sounds?(?: url| link)?"):                                                     GetSound,
-		r("(does anyone know|is there) an? (\w.+)?theme"):                                                                SearchThemes,
-		r("(my )?aliucord (\w.+)?(?:crashed|keeps crashing|crash|crashes|is crashing|crashing|stopped( working)?)"):      AliuCrash,
-		r("(why |with )?(?:is )?full transparency (?:is?.?not|will not|doesn\\'t|does not) (?:work)"):                     FullTransparency,
+		r("(?:does anyone know|is there) an? (?:\w.+)?theme"):                                                                SearchThemes,
+		r("(?:my )?aliucord (?:\w.+)?(?:crashed|keeps crashing|crash|crashes|is crashing|crashing|stopped(?: working)?)"):      AliuCrash,
+		r("(?:why |with )?(?:is )?full transparency (?:is?.?not|will not|doesn\\'t|does not) (?:work)"):                     FullTransparency,
 	}
 
 	s.AddHandler(func(msg *gateway.MessageCreateEvent) {
