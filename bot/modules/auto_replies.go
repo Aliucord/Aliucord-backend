@@ -30,15 +30,15 @@ func reply(msg *gateway.MessageCreateEvent, reply string) {
 }
 
 const (
-	JustAsk          = "https://dontasktoask.com/"
-	CheckThePins     = "<a:checkpins:859804429536198676>"
-	MentionHelp      = "Rule 9: Don't dm or mention for support"
-	ElaborateHelp    = "We can't help you if you don't tell us your issue. "
-	InstallPlugins   = "https://cdn.discordapp.com/attachments/811261298997460992/875552420363636766/21-08-13-03-31-20.mp4"           // people would rather watch a video than opening the docu so
-	InstallThemes    = "https://cdn.discordapp.com/attachments/865188789542060063/932412193159397457/HowToInstallAliucordThemes2.mp4" // ven owes me a million dollars, now with themer install
-	CreateThemes     = "Read this documentation: https://github.com/Aliucord/documentation/tree/main/theme-dev"
-	ThemeSounds      = "https://cdn.discordapp.com/attachments/875213883776847873/908527051600957450/21-11-11-19-21-01.mp4" //soundsssss
-	GetSound         = "https://cdn.discordapp.com/attachments/875213883776847873/1007312170868019210/20220811_103613.mp4"
+	JustAsk        = "https://dontasktoask.com/"
+	CheckThePins   = "<a:checkpins:859804429536198676>"
+	MentionHelp    = "Rule 9: Don't dm or mention for support"
+	ElaborateHelp  = "We can't help you if you don't tell us your issue. "
+	InstallPlugins = "https://aliucord.com/files/tut/InstallPlugins.mp4" // people would rather watch a video than opening the docu so
+	InstallThemes  = "https://aliucord.com/files/tut/InstallThemes.mp4"  // ven owes me a million dollars, now with themer install
+	CreateThemes   = "Read this documentation: https://github.com/Aliucord/documentation/tree/main/theme-dev"
+	ThemeSounds    = "https://aliucord.com/files/tut/ThemeSounds.mp4" // sounds
+	// GetSound         = "https://cdn.discordapp.com/attachments/875213883776847873/1007312170868019210/20220811_103613.mp4"
 	FullTransparency = "1. Are you using a theme that requires full transparency? If the answer is no, then that's the problem. Normally in the description says what transparency you need to use. 2. Are you using a custom ROM? If the answer is yes, then we can't do nothing about it."
 	SearchThemes     = "Check <#824357609778708580> and search on there, maybe there's the theme you want"
 	AliuCrash        = "Send crashlogs (check Crashes in Settings, and copy the most recent), if there aren't any crashlogs, then we can't do nothing about it. (If you want, you can try send a logcat, check <https://pastebin.com/pNhXwhrd>)"
@@ -68,20 +68,20 @@ func initAutoReplies() {
 	}
 
 	autoRepliesRegex := map[*regexp.Regexp]string{
-		r("^(?:i need )?help(?: me)?$"):                                                                                    ElaborateHelp,
-		r("<@!?\\d{2,19}> help"):                                                                                           MentionHelp,
-		r("help <@!?\\d{2,19}>"):                                                                                           MentionHelp,
-		r("animated (profile|avatar|pfp)"):                                                                                 FreeNitro,
-		r("is there a plugin.+"):                                                                                           FindPlugin,
-		r("^where(?: i)?'?s(?: the )?.+ plugin$"):                                                                          FindPlugin,
-		r("^can (?:someone|anybody|anyone|you) help(?: me)?\\??$"):                                                         JustAsk,
-		r("(can.?not|can'?t) (download|find|get) plugin downloader"):                                                       PluginDownloader,
-		r("where( i)?'?s( the)? plugin downloader"):                                                                        PluginDownloader,
-		r("(?:where|how) (?:to|do i|do you) (?:install|download|get) a? ?plugins?"):                                        InstallPlugins,
-		r("how (?:to|do i|do you|i) (?:install|download|apply|get|use) a? ?themes?"):                                       InstallThemes,
-		r("how (?:to|do i|do you|can i) (?:create|make|do) (?:a|my own)? ?(?:custom)? ?themes?"):                           CreateThemes,
-		r("how (?:to|do i|do you|can i|put) (?:change|upload|add|set) (?:sounds?|custom sounds?)"):                         ThemeSounds,
-		r("how (?:to|do i|do you|can i) get sounds?(?: url| link)?"):                                                       GetSound,
+		r("^(?:i need )?help(?: me)?$"):                                                            ElaborateHelp,
+		r("<@!?\\d{2,19}> help"):                                                                   MentionHelp,
+		r("help <@!?\\d{2,19}>"):                                                                   MentionHelp,
+		r("animated (profile|avatar|pfp)"):                                                         FreeNitro,
+		r("is there a plugin.+"):                                                                   FindPlugin,
+		r("^where(?: i)?'?s(?: the )?.+ plugin$"):                                                  FindPlugin,
+		r("^can (?:someone|anybody|anyone|you) help(?: me)?\\??$"):                                 JustAsk,
+		r("(can.?not|can'?t) (download|find|get) plugin downloader"):                               PluginDownloader,
+		r("where( i)?'?s( the)? plugin downloader"):                                                PluginDownloader,
+		r("(?:where|how) (?:to|do i|do you) (?:install|download|get) a? ?plugins?"):                InstallPlugins,
+		r("how (?:to|do i|do you|i) (?:install|download|apply|get|use) a? ?themes?"):               InstallThemes,
+		r("how (?:to|do i|do you|can i) (?:create|make|do) (?:a|my own)? ?(?:custom)? ?themes?"):   CreateThemes,
+		r("how (?:to|do i|do you|can i|put) (?:change|upload|add|set) (?:sounds?|custom sounds?)"): ThemeSounds,
+		// r("how (?:to|do i|do you|can i) get sounds?(?: url| link)?"):                                                       GetSound,
 		r("(?:does anyone know|is there) an? (?:\\w.+)?theme"):                                                             SearchThemes,
 		r("(?:my )?aliucord (?:\\w.+)?(?:crashed|keeps crashing|crash|crashes|is crashing|crashing|stopped(?: working)?)"): AliuCrash,
 		r("(?:why |with )?(?:is )?full transparency (?:is?.?not|will not|doesn\\'t|does not) (?:work)"):                    FullTransparency,

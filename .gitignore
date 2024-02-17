@@ -9,3 +9,4 @@ config.json
 config.prod.json
 go.sum
 pg.env
+static/files
