@@ -20,6 +20,7 @@ var (
 func StartBot(cfg *common.Config) {
 	config = cfg.Bot
 	config.ApkCacheDir = cfg.ApkCacheDir
+	config.Origin = cfg.Origin
 
 	s = state.New("Bot " + config.Token)
 	modules.InitAllModules(logger, config, s)

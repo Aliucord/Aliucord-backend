@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/Aliucord/Aliucord-backend/bot"
+	"github.com/Aliucord/Aliucord-backend/bot/commands"
 	"github.com/Aliucord/Aliucord-backend/bot/modules"
 	"github.com/Aliucord/Aliucord-backend/common"
 	"github.com/Aliucord/Aliucord-backend/database"
@@ -77,6 +78,22 @@ func main() {
 			default:
 				if strings.HasPrefix(path, "/download/direct/") {
 					apkFsHandler(ctx)
+					ctx.Response.Header.Set("Cache-Control", "max-age=31536000") // 1 year
+				} else if strings.HasPrefix(path, "/badges/") { // temporary badges v1 api
+					if strings.HasPrefix(path, "/badges/users/") {
+						id := strings.TrimPrefix(path, "/badges/users/")
+						if data, ok := commands.Badges.Users[id]; ok {
+							json.NewEncoder(ctx).Encode(&data)
+							return
+						}
+					} else if strings.HasPrefix(path, "/badges/guilds/") {
+						id := strings.TrimPrefix(path, "/badges/guilds/")
+						if data, ok := commands.Badges.Guilds[id]; ok {
+							json.NewEncoder(ctx).Encode(data)
+							return
+						}
+					}
+					ctx.NotFound()
 				} else {
 					staticFsHandler(ctx)
 				}

@@ -1,6 +1,6 @@
 module github.com/Aliucord/Aliucord-backend
 
-go 1.21
+go 1.22
 
 require (
 	github.com/Juby210/gplayapi-go v0.0.8-0.20221125171806-b768db9a39c5

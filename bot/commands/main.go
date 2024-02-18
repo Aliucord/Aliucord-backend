@@ -147,7 +147,11 @@ func editReply(e *gateway.InteractionCreateEvent, content string) error {
 }
 
 func findOption(d *discord.CommandInteraction, name string) *discord.CommandInteractionOption {
-	return common.Find(d.Options, func(option *discord.CommandInteractionOption) bool {
+	return findOption2(d.Options, name)
+}
+
+func findOption2(opts discord.CommandInteractionOptions, name string) *discord.CommandInteractionOption {
+	return common.Find(opts, func(option *discord.CommandInteractionOption) bool {
 		return option.Name == name
 	})
 }

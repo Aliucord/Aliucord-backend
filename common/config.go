@@ -33,6 +33,7 @@ type (
 		AutoReplyConfig     *AutoReplyConfig
 
 		ApkCacheDir string `json:"-"`
+		Origin      string `json:"-"`
 	}
 
 	RoleIDsConfig struct {
