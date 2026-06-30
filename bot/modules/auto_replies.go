@@ -34,8 +34,8 @@ const (
 	CheckThePins   = "<a:checkpins:859804429536198676>"
 	MentionHelp    = "Rule 9: Don't dm or mention for support"
 	ElaborateHelp  = "We can't help you if you don't tell us your issue. "
-	InstallPlugins = "https://aliucord.com/files/tut/InstallPlugins.mp4" // people would rather watch a video than opening the docu so
-	InstallThemes  = "https://aliucord.com/files/tut/InstallThemes.mp4"  // ven owes me a million dollars, now with themer install
+	InstallPlugins = "https://backend.aliucord.com/files/tut/InstallPlugins.mp4" // people would rather watch a video than opening the docu so
+	InstallThemes  = "https://backend.aliucord.com/files/tut/InstallThemes.mp4"  // ven owes me a million dollars, now with themer install
 	CreateThemes   = "Read this documentation: https://github.com/Aliucord/documentation/tree/main/theme-dev"
 	ThemeSounds    = "https://aliucord.com/files/tut/ThemeSounds.mp4" // sounds
 	// GetSound         = "https://cdn.discordapp.com/attachments/875213883776847873/1007312170868019210/20220811_103613.mp4"
